@@ -9,11 +9,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(BusinessException.class)
+    public CommonResp businessHandler(BusinessException e) {
+        log.error("业务异常：", e);
+        return CommonResp.fail(e.getBusinessExceptionEnum().getDesc());
+    }
 
     @ExceptionHandler(Exception.class)
     public CommonResp exceptionHandler(Exception e) {
         log.error("系统异常：", e);
-        return CommonResp.fail(e.getMessage());
+        return CommonResp.fail("系统出现异常，请联系管理员");
     }
 
 }

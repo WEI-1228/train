@@ -1,6 +1,8 @@
 package cn.anlper.train.service;
 
 import cn.anlper.train.entities.Member;
+import cn.anlper.train.exception.BusinessException;
+import cn.anlper.train.exception.BusinessExceptionEnum;
 import cn.anlper.train.mapper.MemberMapper;
 import cn.anlper.train.req.MemberRegisterReq;
 import cn.anlper.train.utils.SnowFlake;
@@ -24,7 +26,7 @@ public class MemberService {
         Member one = memberMapper.selectOne(member);
         if (one != null) {
 //            return -1L;
-            throw new RuntimeException("用户手机号已注册");
+            throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_EXIST);
         }
 
         member.setId(snowFlake.nextId());
