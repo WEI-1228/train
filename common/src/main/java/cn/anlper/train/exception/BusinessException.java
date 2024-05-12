@@ -7,4 +7,9 @@ import lombok.Data;
 @Data
 public class BusinessException extends RuntimeException{
     private BusinessExceptionEnum businessExceptionEnum;
+
+    @Override
+    public Throwable fillInStackTrace() {
+        return this;
+    }
 }

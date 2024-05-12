@@ -11,7 +11,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public CommonResp businessHandler(BusinessException e) {
-        log.error("业务异常：", e);
+        log.error("业务异常：{}", e.getBusinessExceptionEnum().getDesc());
         return CommonResp.fail(e.getBusinessExceptionEnum().getDesc());
     }
 
