@@ -4,9 +4,12 @@ import cn.anlper.train.entities.Member;
 import cn.anlper.train.exception.BusinessException;
 import cn.anlper.train.exception.BusinessExceptionEnum;
 import cn.anlper.train.mapper.MemberMapper;
+import cn.anlper.train.req.MemberLoginReq;
 import cn.anlper.train.req.MemberRegisterReq;
 import cn.anlper.train.req.MemberSendCodeReq;
+import cn.anlper.train.resp.MemberLoginResp;
 import cn.anlper.train.utils.SnowFlake;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +30,10 @@ public class MemberService {
     public void sendCode(MemberSendCodeReq req) {
         Member member = new Member();
         member.setMobile(req.getMobile());
-        Member one = memberMapper.selectOne(member);
+        Member memberDB = memberMapper.selectOne(member);
 
         // 手机号不存在，插入
-        if (one == null) {
+        if (memberDB == null) {
             log.info("手机号不存在，插入一条记录");
             member.setId(snowFlake.nextId());
             memberMapper.insert(member);
@@ -46,19 +49,34 @@ public class MemberService {
         // 最后通过短信接口发送给用户
         log.info("保存短信记录表");
         log.info("调用短信接口发送给用户");
+        // TODO 将验证码放到MySQL中，用于登录校验。不需要用Redis，因为不是高并发动作
     }
 
     public Long register(MemberRegisterReq req) {
         Member member = new Member();
         member.setMobile(req.getMobile());
-        Member one = memberMapper.selectOne(member);
-        if (one != null) {
-//            return -1L;
+        Member memberDB = memberMapper.selectOne(member);
+        if (memberDB != null) {
             throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_EXIST);
         }
 
         member.setId(snowFlake.nextId());
         memberMapper.insert(member);
         return member.getId();
+    }
+
+    public MemberLoginResp login(MemberLoginReq req) {
+        Member member = new Member();
+        member.setMobile(req.getMobile());
+        Member memberDB = memberMapper.selectOne(member);
+        if (memberDB == null) {
+            throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_NOT_EXIST);
+        }
+
+        if (!req.getCode().equals("8888")) {
+            throw new BusinessException(BusinessExceptionEnum.MEMBER_MOBILE_CODE_ERROR);
+        }
+
+        return BeanUtil.copyProperties(memberDB, MemberLoginResp.class);
     }
 }
