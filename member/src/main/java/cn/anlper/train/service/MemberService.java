@@ -2,6 +2,7 @@ package cn.anlper.train.service;
 
 import cn.anlper.train.entities.Member;
 import cn.anlper.train.mapper.MemberMapper;
+import cn.anlper.train.req.MemberRegisterReq;
 import cn.anlper.train.utils.SnowFlake;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,9 @@ public class MemberService {
         return memberMapper.selectCount(null);
     }
 
-    public Long register(String mobile) {
+    public Long register(MemberRegisterReq req) {
         Member member = new Member();
-        member.setMobile(mobile);
+        member.setMobile(req.getMobile());
         Member one = memberMapper.selectOne(member);
         if (one != null) {
 //            return -1L;
