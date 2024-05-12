@@ -30,6 +30,7 @@
         <spring.boot.version>3.0.9</spring.boot.version>
         <spring.cloud.alibaba.version>2022.0.0.0-RC2</spring.cloud.alibaba.version>
         <spring.cloud.version>2022.0.2</spring.cloud.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <!--仅为了整合openfeign + alibaba sentinel的案例，降低版本处理下-->
         <!--        <spring.boot.version>3.0.9</spring.boot.version>-->
         <!--        <spring.cloud.version>2022.0.2</spring.cloud.version>-->
@@ -171,6 +172,11 @@
                 <groupId>io.zipkin.reporter2</groupId>
                 <artifactId>zipkin-reporter-brave</artifactId>
                 <version>${zipkin-reporter-brave.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
