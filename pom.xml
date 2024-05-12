@@ -13,6 +13,7 @@
         <module>member</module>
         <module>common</module>
         <module>gateway</module>
+        <module>mybatis-generator</module>
     </modules>
 
     <properties>
