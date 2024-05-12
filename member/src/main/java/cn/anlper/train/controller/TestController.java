@@ -1,6 +1,7 @@
 package cn.anlper.train.controller;
 
 import cn.anlper.train.req.MemberRegisterReq;
+import cn.anlper.train.req.MemberSendCodeReq;
 import cn.anlper.train.resp.CommonResp;
 import cn.anlper.train.service.MemberService;
 import jakarta.annotation.Resource;
@@ -32,5 +33,11 @@ public class TestController {
     public CommonResp register(@Validated MemberRegisterReq req) {
         Long register = memberService.register(req);
         return CommonResp.ok(register);
+    }
+
+    @PostMapping("/send-code")
+    public CommonResp sendCode(@Validated MemberSendCodeReq req) {
+        memberService.sendCode(req);
+        return CommonResp.ok("ok");
     }
 }
