@@ -1,0 +1,6 @@
+POST http://localhost:8000/member/register
+Content-Type: application/x-www-form-urlencoded
+
+mobile = 19978123115
+
+###

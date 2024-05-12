@@ -3,6 +3,7 @@ package cn.anlper.train.controller;
 import cn.anlper.train.service.MemberService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,5 +22,10 @@ public class TestController {
     @GetMapping("/count")
     public int mob() {
         return memberService.count();
+    }
+
+    @PostMapping("/register")
+    public Long register(String mobile) {
+        return memberService.register(mobile);
     }
 }
