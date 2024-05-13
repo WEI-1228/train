@@ -27,7 +27,11 @@
 
         <javaClientGenerator targetPackage="${package.name}.mapper" targetProject="src/main/java" type="XMLMAPPER"/>
 
-        <table tableName="member" domainObjectName="Member">
+<!--        <table tableName="member" domainObjectName="Member">-->
+<!--            <generatedKey column="id" sqlStatement="JDBC"/>-->
+<!--        </table>-->
+
+        <table tableName="passenger" domainObjectName="Passenger">
             <generatedKey column="id" sqlStatement="JDBC"/>
         </table>
 
