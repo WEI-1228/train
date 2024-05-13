@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 public class Test1Filter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("Test1Filter, order 1");
+        log.info("接收到请求，参数为：{}", exchange.getRequest().getQueryParams());
         return chain.filter(exchange);
     }
 
