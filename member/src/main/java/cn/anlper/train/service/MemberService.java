@@ -8,15 +8,13 @@ import cn.anlper.train.req.MemberLoginReq;
 import cn.anlper.train.req.MemberRegisterReq;
 import cn.anlper.train.req.MemberSendCodeReq;
 import cn.anlper.train.resp.MemberLoginResp;
+import cn.anlper.train.utils.JwtUtil;
 import cn.anlper.train.utils.SnowFlake;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.jwt.JWTUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -81,9 +79,7 @@ public class MemberService {
         }
 
         MemberLoginResp memberLoginResp = BeanUtil.copyProperties(memberDB, MemberLoginResp.class);
-        Map<String, Object> payload = BeanUtil.beanToMap(memberLoginResp);
-        String key = "258079";
-        String token = JWTUtil.createToken(payload, key.getBytes());
+        String token = JwtUtil.createToken(memberLoginResp.getId(), memberLoginResp.getMobile());
         memberLoginResp.setToken(token);
         return memberLoginResp;
     }
