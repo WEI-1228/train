@@ -1,5 +1,6 @@
 package cn.anlper.train.service;
 
+import cn.anlper.train.context.LoginMemberContext;
 import cn.anlper.train.entities.Passenger;
 import cn.anlper.train.mapper.PassengerMapper;
 import cn.anlper.train.req.PassengerSaveReq;
@@ -21,6 +22,7 @@ public class PassengerService {
     public void save(PassengerSaveReq req) {
         DateTime now = DateTime.now();
         Passenger passenger = BeanUtil.copyProperties(req, Passenger.class);
+        passenger.setMemberId(LoginMemberContext.getId());
         passenger.setId(snowFlake.nextId());
         passenger.setCreateTime(now);
         passenger.setUpdateTime(now);
