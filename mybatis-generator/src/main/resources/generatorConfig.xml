@@ -31,8 +31,8 @@
 <!--            <generatedKey column="id" sqlStatement="JDBC"/>-->
 <!--        </table>-->
 
-        <table tableName="passenger" domainObjectName="Passenger">
-            <generatedKey column="id" sqlStatement="JDBC"/>
+        <table tableName="${table.name}" domainObjectName="${object.name}">
+            <generatedKey column="${generateKey}" sqlStatement="JDBC"/>
         </table>
 
     </context>
