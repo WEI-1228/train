@@ -5,12 +5,14 @@ import cn.anlper.train.entities.Passenger;
 import cn.anlper.train.mapper.PassengerMapper;
 import cn.anlper.train.req.PassengerQueryReq;
 import cn.anlper.train.req.PassengerSaveReq;
+import cn.anlper.train.resp.PageResp;
 import cn.anlper.train.resp.PassengerQueryResp;
 import cn.anlper.train.utils.SnowFlake;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjUtil;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,15 +38,22 @@ public class PassengerService {
         passengerMapper.insert(passenger);
     }
 
-    public List<PassengerQueryResp> queryList(PassengerQueryReq req) {
+    public PageResp queryList(PassengerQueryReq req) {
         Example example = new Example(Passenger.class);
         Example.Criteria criteria = example.createCriteria();
         if (ObjUtil.isNotNull(req.getMemberId()))
             criteria.andEqualTo("memberId", req.getMemberId());
         PageHelper.startPage(req.getPage(), req.getSize());
 
+        log.info("查询页码：{}", req.getPage());
+        log.info("每页条数：{}", req.getSize());
         List<Passenger> passengerList = passengerMapper.selectByExample(example);
+        PageInfo<Passenger> pageInfo = new PageInfo<>(passengerList);
+        log.info("总行数：{}", pageInfo.getTotal());
+        log.info("总页数：{}", pageInfo.getPages());
+
         List<PassengerQueryResp> passengerQueryRespList = BeanUtil.copyToList(passengerList, PassengerQueryResp.class);
-        return passengerQueryRespList;
+        PageResp<PassengerQueryResp> pageResp = new PageResp<>(passengerQueryRespList, pageInfo.getTotal());
+        return pageResp;
     }
 }
