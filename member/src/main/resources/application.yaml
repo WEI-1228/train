@@ -1,9 +1,12 @@
 server:
   port: 8001
+  servlet:
+    context-path: "/member"
 
 spring:
   application:
     name: train-member-service
+
 
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
