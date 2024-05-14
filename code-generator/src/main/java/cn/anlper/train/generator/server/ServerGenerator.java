@@ -11,15 +11,17 @@ import java.util.Map;
 import java.util.Properties;
 
 public class ServerGenerator {
-    static final String TYPE = "controller";
-
-    static String servicePath = "[module]/src/main/java/cn/anlper/train/" + TYPE + "/";
-    static String configPath = "/Users/liujiawei/IdeaProjects/project/train/mybatis-generator/src/main/resources/config.properties";
-    static {
-        new File(servicePath).mkdirs();
+    public static void main(String[] args) throws IOException, TemplateException {
+        ServerGenerator serverGenerator = new ServerGenerator();
+        serverGenerator.generate("controller");
+        serverGenerator.generate("service");
     }
 
-    public static void main(String[] args) throws IOException, TemplateException {
+    private void generate(String TYPE) throws IOException, TemplateException {
+        String servicePath = "[module]/src/main/java/cn/anlper/train/" + TYPE + "/";
+        String configPath = "/Users/liujiawei/IdeaProjects/project/train/mybatis-generator/src/main/resources/config.properties";
+        new File(servicePath).mkdirs();
+
         Properties properties = new Properties();
 
         FileInputStream fileInputStream = new FileInputStream(configPath);
@@ -45,13 +47,8 @@ public class ServerGenerator {
         param.put("do_main", do_main);
         System.out.println("组装参数：" + param);
 
-        generate(Domain, param);
-
-    }
-
-    private static void generate(String Domain, Map<String, Object> param) throws IOException, TemplateException {
-        FreemarkerUtil.initConfig(ServerGenerator.TYPE + ".ftl");
-        String Target = ServerGenerator.TYPE.substring(0, 1).toUpperCase() + ServerGenerator.TYPE.substring(1);
+        FreemarkerUtil.initConfig(TYPE + ".ftl");
+        String Target = TYPE.substring(0, 1).toUpperCase() + TYPE.substring(1);
         String fileName = servicePath + Domain + Target + ".java";
         System.out.println("开始生成：" + fileName);
         FreemarkerUtil.generator(fileName, param);
