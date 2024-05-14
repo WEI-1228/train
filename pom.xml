@@ -14,6 +14,7 @@
         <module>common</module>
         <module>gateway</module>
         <module>mybatis-generator</module>
+        <module>code-generator</module>
     </modules>
 
     <properties>
@@ -193,6 +194,7 @@
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.version}</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
