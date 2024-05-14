@@ -1,17 +1,20 @@
 package cn.anlper.train.generator.server;
 
+import cn.anlper.train.generator.util.FreemarkerUtil;
 import freemarker.template.TemplateException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class ServerGenerator {
-    static String toPath = "code-generator/src/main/java/cn/anlper/train/generator/test/";
+    static String servicePath = "[module]/src/main/java/cn/anlper/train/service/";
     static String configPath = "/Users/liujiawei/IdeaProjects/project/train/mybatis-generator/src/main/resources/config.properties";
     static {
-        new File(toPath).mkdirs();
+        new File(servicePath).mkdirs();
     }
 
     public static void main(String[] args) throws IOException, TemplateException {
@@ -23,19 +26,25 @@ public class ServerGenerator {
 
         // 读取属性值
         String url = properties.getProperty("jdbc.url");
-        String username = properties.getProperty("jdbc.user");
+        String user = properties.getProperty("jdbc.user");
         String password = properties.getProperty("jdbc.password");
+        String module = properties.getProperty("module");
+        String tableName = properties.getProperty("table.name");
+        String Domain = properties.getProperty("object.name");
+        String generateKey = properties.getProperty("generateKey");
 
-        // 打印属性值
-        System.out.println("URL: " + url);
-        System.out.println("Username: " + username);
-        System.out.println("Password: " + password);
+        servicePath = servicePath.replace("[module]", module);
+        String domain = Domain.substring(0, 1).toLowerCase() + Domain.substring(1);
+        String do_main = tableName.replaceAll("_", "-");
 
-//        FreemarkerUtil.initConfig("test.ftl");
-//        HashMap<String, Object> param = new HashMap<>();
-//        param.put("domain", "Test");
-//        FreemarkerUtil.generator(toPath + "Test.java", param);
+        Map<String, Object> param = new HashMap<>();
+        param.put("Domain", Domain);
+        param.put("domain", domain);
+        param.put("do_main", do_main);
+        System.out.println("组装参数：" + param);
 
+        FreemarkerUtil.initConfig("service.ftl");
+        FreemarkerUtil.generator(servicePath + Domain + "Service.java", param);
 
     }
 }
