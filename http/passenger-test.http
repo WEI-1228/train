@@ -29,3 +29,6 @@ token: {{token}}
 }
 
 ###
+
+DELETE http://localhost:8000/member/passenger/delete/445566896843132928
+token: {{token}}
