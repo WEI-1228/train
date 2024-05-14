@@ -10,6 +10,7 @@ import cn.anlper.train.utils.SnowFlake;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjUtil;
+import com.github.pagehelper.PageHelper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class PassengerService {
         Example.Criteria criteria = example.createCriteria();
         if (ObjUtil.isNotNull(req.getMemberId()))
             criteria.andEqualTo("memberId", req.getMemberId());
+        PageHelper.startPage(req.getPage(), req.getSize());
 
         List<Passenger> passengerList = passengerMapper.selectByExample(example);
         List<PassengerQueryResp> passengerQueryRespList = BeanUtil.copyToList(passengerList, PassengerQueryResp.class);
