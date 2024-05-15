@@ -4,7 +4,7 @@ import cn.anlper.train.req.trainStationQueryReq;
 import cn.anlper.train.req.trainStationSaveReq;
 import cn.anlper.train.resp.CommonResp;
 import cn.anlper.train.resp.PageResp;
-import cn.anlper.train.service.trainStationService;
+import cn.anlper.train.service.TrainStationService;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class trainStationController {
 
     @Resource
-    private trainStationService trainStationService;
+    private TrainStationService trainStationService;
 
     @PostMapping("/save")
     public CommonResp save(@RequestBody @Validated trainStationSaveReq req) {

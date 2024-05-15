@@ -77,7 +77,7 @@ export default defineComponent({
       id: undefined,
       date: undefined,
       trainCode: undefined,
-      index: undefined,
+      indexes: undefined,
       name: undefined,
       namePinyin: undefined,
       inTime: undefined,

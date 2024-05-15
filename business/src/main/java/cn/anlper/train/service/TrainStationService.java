@@ -1,7 +1,7 @@
 package cn.anlper.train.service;
 
 import cn.anlper.train.entities.TrainStation;
-import cn.anlper.train.mapper.trainStationMapper;
+import cn.anlper.train.mapper.TrainStationMapper;
 import cn.anlper.train.req.trainStationQueryReq;
 import cn.anlper.train.req.trainStationSaveReq;
 import cn.anlper.train.resp.PageResp;
@@ -21,9 +21,9 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class trainStationService {
+public class TrainStationService {
     @Resource
-    private trainStationMapper trainStationMapper;
+    private TrainStationMapper trainStationMapper;
 
     @Resource
     private SnowFlake snowFlake;

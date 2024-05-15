@@ -59,6 +59,13 @@ public class StationService {
         return pageResp;
     }
 
+    public List<StationQueryResp> queryAll() {
+        Example example = new Example(Station.class);
+        List<Station> stationList = stationMapper.selectByExample(example);
+        return BeanUtil.copyToList(stationList, StationQueryResp.class);
+    }
+
+
     public void delete(Long id) {
         stationMapper.deleteByPrimaryKey(id);
     }

@@ -32,7 +32,7 @@
         <train-select-view v-model="trainStation.trainCode"></train-select-view>
       </a-form-item>
       <a-form-item label="站序">
-        <a-input v-model:value="trainStation.index" />
+        <a-input v-model:value="trainStation.indexes" />
       </a-form-item>
       <a-form-item label="站名">
         <station-select-view v-model="trainStation.name"></station-select-view>
@@ -73,7 +73,7 @@ export default defineComponent({
     let trainStation = ref({
       id: undefined,
       trainCode: undefined,
-      index: undefined,
+      indexes: undefined,
       name: undefined,
       namePinyin: undefined,
       inTime: undefined,
