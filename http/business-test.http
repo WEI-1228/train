@@ -1,9 +1,8 @@
-GET http://localhost:8000/business/business/hello
+GET http://localhost:8002/business/business/hello
 token: {{token}}
 
 ###
-POST http://localhost:8000/member/register
-Content-Type: application/x-www-form-urlencoded
+GET http://localhost:8002/business/station/query-list?page=1&size=2
 
 #mobile = 112553423
 
