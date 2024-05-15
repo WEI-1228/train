@@ -1,5 +1,6 @@
 package cn.anlper.train.service;
 
+import cn.anlper.train.controller.enums.SeatColEnum;
 import cn.anlper.train.entities.TrainCarriage;
 import cn.anlper.train.mapper.TrainCarriageMapper;
 import cn.anlper.train.req.TrainCarriageQueryReq;
@@ -30,6 +31,11 @@ public class TrainCarriageService {
     private SnowFlake snowFlake;
     public void save(TrainCarriageSaveReq req) {
         DateTime now = DateTime.now();
+
+        List<SeatColEnum> colsByType = SeatColEnum.getColsByType(req.getSeatType());
+        req.setColCount(colsByType.size());
+        req.setSeatCount(req.getColCount() * req.getRowCount());
+
         TrainCarriage trainCarriage = BeanUtil.copyProperties(req, TrainCarriage.class);
         if (ObjUtil.isNull(trainCarriage.getId())) {
             trainCarriage.setId(snowFlake.nextId());
