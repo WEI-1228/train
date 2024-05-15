@@ -12,8 +12,8 @@ public class TrainSeatQueryResp {
     private Long id;
     private String trainCode;
     private Integer carriageIndex;
-    private String row;
-    private String col;
+    private String seatRow;
+    private String seatCol;
     private String seatType;
     private Integer carriageSeatIndex;
 }

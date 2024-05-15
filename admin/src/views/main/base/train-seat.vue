@@ -48,8 +48,8 @@ export default defineComponent({
       id: undefined,
       trainCode: undefined,
       carriageIndex: undefined,
-      row: undefined,
-      col: undefined,
+      seatRow: undefined,
+      seatCol: undefined,
       seatType: undefined,
       carriageSeatIndex: undefined,
       createTime: undefined,
@@ -79,13 +79,13 @@ export default defineComponent({
     },
     {
       title: '排号',
-      dataIndex: 'row',
-      key: 'row',
+      dataIndex: 'seatRow',
+      key: 'seatRow',
     },
     {
       title: '列号',
-      dataIndex: 'col',
-      key: 'col',
+      dataIndex: 'seatCol',
+      key: 'seatCol',
     },
     {
       title: '座位类型',
