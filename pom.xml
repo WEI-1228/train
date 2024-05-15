@@ -15,6 +15,7 @@
         <module>gateway</module>
         <module>mybatis-generator</module>
         <module>code-generator</module>
+        <module>business</module>
     </modules>
 
     <properties>

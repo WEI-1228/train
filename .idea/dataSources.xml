@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="member" uuid="e4999e67-aa18-41da-9dea-6221b8c9b818">
+    <data-source source="LOCAL" name="member" uuid="c048a7c6-d269-4025-9297-1bb58664a212">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/train_member</jdbc-url>
+      <jdbc-url>jdbc:mysql://121.196.247.67:3306/train_member</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
@@ -13,11 +13,11 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="RDS_member" uuid="c048a7c6-d269-4025-9297-1bb58664a212">
+    <data-source source="LOCAL" name="business" uuid="1a1e2cc7-2fc7-4fb0-8901-20bfc48ca7c3">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://121.196.247.67:3306/train_member</jdbc-url>
+      <jdbc-url>jdbc:mysql://121.196.247.67:3306/train_business</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />

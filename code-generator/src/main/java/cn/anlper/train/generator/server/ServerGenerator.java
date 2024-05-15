@@ -20,7 +20,6 @@ public class ServerGenerator {
     private void generate(String TYPE) throws IOException, TemplateException {
         String servicePath = "[module]/src/main/java/cn/anlper/train/" + TYPE + "/";
         String configPath = "/Users/liujiawei/IdeaProjects/project/train/mybatis-generator/src/main/resources/config.properties";
-        new File(servicePath).mkdirs();
 
         Properties properties = new Properties();
 
@@ -38,6 +37,7 @@ public class ServerGenerator {
         String generateKey = properties.getProperty("generateKey");
 
         servicePath = servicePath.replace("[module]", module);
+        new File(servicePath).mkdirs();
         String domain = Domain.substring(0, 1).toLowerCase() + Domain.substring(1);
         String do_main = tableName.replaceAll("_", "-");
 
