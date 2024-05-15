@@ -11,7 +11,7 @@ import java.util.Date;
 
 @Data
 @ToString
-public class trainStationQueryResp {
+public class TrainStationQueryResp {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     private String trainCode;

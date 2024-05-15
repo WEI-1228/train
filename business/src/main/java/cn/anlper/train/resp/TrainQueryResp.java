@@ -1,5 +1,6 @@
 package cn.anlper.train.resp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
@@ -16,8 +17,10 @@ public class TrainQueryResp {
     private String type;
     private String start;
     private String startPinyin;
+    @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
     private String end;
     private String endPinyin;
+    @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 }

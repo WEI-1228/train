@@ -1,5 +1,6 @@
 package cn.anlper.train.req;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
 
@@ -13,8 +14,10 @@ public class TrainSaveReq {
     private String type;
     private String start;
     private String startPinyin;
+    @JsonFormat(pattern = "hh:MM:ss", timezone = "GMT+8")
     private Date startTime;
     private String end;
     private String endPinyin;
+    @JsonFormat(pattern = "hh:MM:ss", timezone = "GMT+8")
     private Date endTime;
 }

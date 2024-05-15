@@ -5,7 +5,7 @@ import cn.anlper.train.mapper.TrainStationMapper;
 import cn.anlper.train.req.trainStationQueryReq;
 import cn.anlper.train.req.trainStationSaveReq;
 import cn.anlper.train.resp.PageResp;
-import cn.anlper.train.resp.trainStationQueryResp;
+import cn.anlper.train.resp.TrainStationQueryResp;
 import cn.anlper.train.utils.SnowFlake;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
@@ -53,8 +53,8 @@ public class TrainStationService {
         log.info("总行数：{}", pageInfo.getTotal());
         log.info("总页数：{}", pageInfo.getPages());
 
-        List<trainStationQueryResp> trainStationQueryRespList = BeanUtil.copyToList(trainStationList, trainStationQueryResp.class);
-        PageResp<trainStationQueryResp> pageResp = new PageResp<>(trainStationQueryRespList, pageInfo.getTotal());
+        List<TrainStationQueryResp> trainStationQueryRespList = BeanUtil.copyToList(trainStationList, TrainStationQueryResp.class);
+        PageResp<TrainStationQueryResp> pageResp = new PageResp<>(trainStationQueryRespList, pageInfo.getTotal());
         return pageResp;
     }
 
