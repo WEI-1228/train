@@ -13,12 +13,14 @@ import java.util.Properties;
 public class ServerGenerator {
     public static void main(String[] args) throws IOException, TemplateException {
         ServerGenerator serverGenerator = new ServerGenerator();
-        serverGenerator.generate("controller");
-        serverGenerator.generate("service");
+        serverGenerator.generate("controller/admin","controller");
+        serverGenerator.generate("service","service");
+        serverGenerator.generate("req","queryReq");
+        serverGenerator.generate("resp","queryResp");
+        serverGenerator.generate("req","saveReq");
     }
 
-    private void generate(String TYPE) throws IOException, TemplateException {
-        String servicePath = "[module]/src/main/java/cn/anlper/train/" + TYPE + "/";
+    private void generate(String prefix, String TYPE) throws IOException, TemplateException {
         String configPath = "/Users/liujiawei/IdeaProjects/project/train/mybatis-generator/src/main/resources/config.properties";
 
         Properties properties = new Properties();
@@ -36,6 +38,7 @@ public class ServerGenerator {
         String Domain = properties.getProperty("object.name");
         String generateKey = properties.getProperty("generateKey");
 
+        String servicePath = "[module]/src/main/java/cn/anlper/train/" + prefix + "/";
         servicePath = servicePath.replace("[module]", module);
         new File(servicePath).mkdirs();
         String domain = Domain.substring(0, 1).toLowerCase() + Domain.substring(1);
