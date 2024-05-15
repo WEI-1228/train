@@ -1,6 +1,5 @@
 package cn.anlper.train.controller;
 
-import cn.anlper.train.context.LoginMemberContext;
 import cn.anlper.train.req.${Domain}QueryReq;
 import cn.anlper.train.req.${Domain}SaveReq;
 import cn.anlper.train.resp.CommonResp;
@@ -25,7 +24,6 @@ public class ${Domain}Controller {
 
     @GetMapping("/query-list")
     public CommonResp queryList(@Validated ${Domain}QueryReq req) {
-        req.setMemberId(LoginMemberContext.getId());
         PageResp pageResp = ${domain}Service.queryList(req);
         return CommonResp.ok(pageResp);
     }

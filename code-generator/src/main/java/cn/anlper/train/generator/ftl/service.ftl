@@ -1,6 +1,5 @@
 package cn.anlper.train.service;
 
-import cn.anlper.train.context.LoginMemberContext;
 import cn.anlper.train.entities.${Domain};
 import cn.anlper.train.mapper.${Domain}Mapper;
 import cn.anlper.train.req.${Domain}QueryReq;
@@ -32,7 +31,6 @@ public class ${Domain}Service {
         DateTime now = DateTime.now();
         ${Domain} ${domain} = BeanUtil.copyProperties(req, ${Domain}.class);
         if (ObjUtil.isNull(${domain}.getId())) {
-            ${domain}.setMemberId(LoginMemberContext.getId());
             ${domain}.setId(snowFlake.nextId());
             ${domain}.setCreateTime(now);
             ${domain}.setUpdateTime(now);
@@ -46,9 +44,6 @@ public class ${Domain}Service {
 
     public PageResp queryList(${Domain}QueryReq req) {
         Example example = new Example(${Domain}.class);
-        Example.Criteria criteria = example.createCriteria();
-        if (ObjUtil.isNotNull(req.getMemberId()))
-            criteria.andEqualTo("memberId", req.getMemberId());
         PageHelper.startPage(req.getPage(), req.getSize());
 
         log.info("查询页码：{}", req.getPage());

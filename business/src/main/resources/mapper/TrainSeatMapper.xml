@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.anlper.train.mapper.TrainSeatMapper">
+  <resultMap id="BaseResultMap" type="cn.anlper.train.entities.TrainSeat">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="train_code" jdbcType="VARCHAR" property="trainCode" />
+    <result column="carriage_index" jdbcType="INTEGER" property="carriageIndex" />
+    <result column="row" jdbcType="CHAR" property="row" />
+    <result column="col" jdbcType="CHAR" property="col" />
+    <result column="seat_type" jdbcType="CHAR" property="seatType" />
+    <result column="carriage_seat_index" jdbcType="INTEGER" property="carriageSeatIndex" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+</mapper>
