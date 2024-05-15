@@ -5,6 +5,7 @@ import cn.anlper.train.req.TrainSaveReq;
 import cn.anlper.train.resp.CommonResp;
 import cn.anlper.train.resp.PageResp;
 import cn.anlper.train.resp.TrainQueryResp;
+import cn.anlper.train.service.TrainSeatService;
 import cn.anlper.train.service.TrainService;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +19,8 @@ public class TrainController {
 
     @Resource
     private TrainService trainService;
+    @Resource
+    private TrainSeatService trainSeatService;
 
     @PostMapping("/save")
     public CommonResp save(@RequestBody @Validated TrainSaveReq req) {
@@ -40,6 +43,12 @@ public class TrainController {
     @DeleteMapping("/delete/{id}")
     public CommonResp delete(@PathVariable("id") Long id) {
         trainService.delete(id);
+        return CommonResp.ok(null);
+    }
+
+    @GetMapping("/gen-seat/{trainCode}")
+    public CommonResp genSeat(@PathVariable("trainCode") String trainCode) {
+        trainSeatService.genTrainSeat(trainCode);
         return CommonResp.ok(null);
     }
 }

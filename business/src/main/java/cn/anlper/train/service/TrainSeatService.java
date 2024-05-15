@@ -1,5 +1,7 @@
 package cn.anlper.train.service;
 
+import cn.anlper.train.controller.enums.SeatColEnum;
+import cn.anlper.train.entities.TrainCarriage;
 import cn.anlper.train.entities.TrainSeat;
 import cn.anlper.train.mapper.TrainSeatMapper;
 import cn.anlper.train.req.TrainSeatQueryReq;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -25,6 +28,8 @@ import java.util.List;
 public class TrainSeatService {
     @Resource
     private TrainSeatMapper trainSeatMapper;
+    @Resource
+    private TrainCarriageService trainCarriageService;
 
     @Resource
     private SnowFlake snowFlake;
@@ -66,5 +71,38 @@ public class TrainSeatService {
 
     public void delete(Long id) {
         trainSeatMapper.deleteByPrimaryKey(id);
+    }
+
+    public void genTrainSeat(String trainCode) {
+        Date date = new Date();
+        // 清空当前车次所有记录
+        Example example = new Example(TrainSeat.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("trainCode", trainCode);
+        trainSeatMapper.deleteByExample(example );
+        // 查找当前车次下的所有车厢
+        List<TrainCarriage> trainCarriages = trainCarriageService.selectByTrainCode(trainCode);
+        // 循环生成每个车厢的座位
+        for (TrainCarriage carriage : trainCarriages) {
+            Integer rowCount = carriage.getRowCount();
+            String seatType = carriage.getSeatType();
+            List<SeatColEnum> colEnumList = SeatColEnum.getColsByType(seatType);
+            int seatIndex = 1;
+            for (int row = 1; row <= rowCount; row++) {
+                for (SeatColEnum colEnum : colEnumList) {
+                    TrainSeat trainSeat = new TrainSeat();
+                    trainSeat.setId(snowFlake.nextId());
+                    trainSeat.setCarriageIndex(carriage.getIndexes());
+                    trainSeat.setSeatType(seatType);
+                    trainSeat.setTrainCode(trainCode);
+                    trainSeat.setSeatCol(colEnum.getCode());
+                    trainSeat.setSeatRow(StrUtil.fillBefore(String.valueOf(row), '0', 2));
+                    trainSeat.setCarriageSeatIndex(seatIndex++);
+                    trainSeat.setCreateTime(date);
+                    trainSeat.setUpdateTime(date);
+                    trainSeatMapper.insert(trainSeat);
+                }
+            }
+        }
     }
 }

@@ -67,4 +67,12 @@ public class TrainCarriageService {
     public void delete(Long id) {
         trainCarriageMapper.deleteByPrimaryKey(id);
     }
+
+    public List<TrainCarriage> selectByTrainCode(String trainCode) {
+        Example example = new Example(TrainCarriage.class);
+        example.setOrderByClause("indexes asc");
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("trainCode", trainCode);
+        return trainCarriageMapper.selectByExample(example);
+    }
 }
