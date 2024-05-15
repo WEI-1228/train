@@ -7,7 +7,7 @@
     -->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="train_code" jdbcType="VARCHAR" property="trainCode" />
-    <result column="index" jdbcType="INTEGER" property="index" />
+    <result column="indexes" jdbcType="INTEGER" property="indexes" />
     <result column="seat_type" jdbcType="CHAR" property="seatType" />
     <result column="seat_count" jdbcType="INTEGER" property="seatCount" />
     <result column="row_count" jdbcType="INTEGER" property="rowCount" />

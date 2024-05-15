@@ -11,7 +11,7 @@ public class TrainCarriageQueryResp {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     private String trainCode;
-    private Integer index;
+    private Integer indexes;
     private String seatType;
     private Integer seatCount;
     private Integer rowCount;

@@ -28,7 +28,7 @@ public class TrainCarriage {
     /**
      * 厢号
      */
-    private Integer index;
+    private Integer indexes;
 
     /**
      * 座位类型|枚举[SeatTypeEnum]
@@ -105,19 +105,19 @@ public class TrainCarriage {
     /**
      * 获取厢号
      *
-     * @return index - 厢号
+     * @return indexes - 厢号
      */
-    public Integer getIndex() {
-        return index;
+    public Integer getIndexes() {
+        return indexes;
     }
 
     /**
      * 设置厢号
      *
-     * @param index 厢号
+     * @param indexes 厢号
      */
-    public void setIndex(Integer index) {
-        this.index = index;
+    public void setIndexes(Integer indexes) {
+        this.indexes = indexes;
     }
 
     /**

@@ -39,7 +39,7 @@
         <train-select-view v-model="trainCarriage.trainCode"></train-select-view>
       </a-form-item>
       <a-form-item label="厢号">
-        <a-input v-model:value="trainCarriage.index" />
+        <a-input v-model:value="trainCarriage.indexes" />
       </a-form-item>
       <a-form-item label="座位类型">
         <a-select v-model:value="trainCarriage.seatType">
@@ -48,15 +48,15 @@
           </a-select-option>
         </a-select>
       </a-form-item>
-      <!--<a-form-item label="座位数">-->
-      <!--  <a-input v-model:value="trainCarriage.seatCount" />-->
-      <!--</a-form-item>-->
+      <a-form-item label="座位数">
+        <a-input v-model:value="trainCarriage.seatCount" />
+      </a-form-item>
       <a-form-item label="排数">
         <a-input v-model:value="trainCarriage.rowCount" />
       </a-form-item>
-      <!--<a-form-item label="列数">-->
-      <!--  <a-input v-model:value="trainCarriage.colCount" />-->
-      <!--</a-form-item>-->
+      <a-form-item label="列数">
+        <a-input v-model:value="trainCarriage.colCount" />
+      </a-form-item>
     </a-form>
   </a-modal>
 </template>
@@ -76,7 +76,7 @@ export default defineComponent({
     let trainCarriage = ref({
       id: undefined,
       trainCode: undefined,
-      index: undefined,
+      indexes: undefined,
       seatType: undefined,
       seatCount: undefined,
       rowCount: undefined,
@@ -103,7 +103,7 @@ export default defineComponent({
     },
     {
       title: '厢号',
-      dataIndex: 'index',
+      dataIndex: 'indexes',
       key: 'index',
     },
     {
