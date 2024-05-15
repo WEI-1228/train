@@ -10,6 +10,7 @@ import cn.anlper.train.utils.SnowFlake;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
@@ -44,6 +45,12 @@ public class TrainStationService {
 
     public PageResp queryList(trainStationQueryReq req) {
         Example example = new Example(TrainStation.class);
+        example.setOrderByClause("train_code asc, indexes asc");
+        Example.Criteria criteria = example.createCriteria();
+        if (StrUtil.isNotEmpty(req.getTrainCode())) {
+            criteria.andEqualTo("trainCode", req.getTrainCode());
+        }
+
         PageHelper.startPage(req.getPage(), req.getSize());
 
         log.info("查询页码：{}", req.getPage());

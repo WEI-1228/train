@@ -102,7 +102,7 @@ export default defineComponent({
     },
     {
       title: '站序',
-      dataIndex: 'index',
+      dataIndex: 'indexes',
       key: 'index',
     },
     {
