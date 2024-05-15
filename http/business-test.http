@@ -1,18 +1,25 @@
-GET http://localhost:8002/business/business/hello
+GET http://localhost:8000/business/business/hello
 token: {{token}}
 
 ###
-GET http://localhost:8002/business/station/query-list?page=1&size=2
+GET http://localhost:8000/business/admin/station/query-list?page=1&size=2
 
 #mobile = 112553423
 
 ###
 
-POST http://localhost:8000/member/member/send-code
+POST http://localhost:8000/business/admin/train/save
 Content-Type: application/json
 
 {
-  "mobile": "13970414458"
+  "code": "1232",
+  "type": "1",
+  "start": "南昌西",
+  "startPinyin": "NCX",
+  "startTime": "2021-03-12 12:23:00",
+  "end": "北京北",
+  "endPinyin": "BJB",
+  "endTime": "2021-03-13 12:23:00"
 }
 ###
 
