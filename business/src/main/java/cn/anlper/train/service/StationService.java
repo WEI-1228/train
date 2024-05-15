@@ -1,6 +1,8 @@
 package cn.anlper.train.service;
 
 import cn.anlper.train.entities.Station;
+import cn.anlper.train.exception.BusinessException;
+import cn.anlper.train.exception.BusinessExceptionEnum;
 import cn.anlper.train.mapper.StationMapper;
 import cn.anlper.train.req.StationQueryReq;
 import cn.anlper.train.req.StationSaveReq;
@@ -31,6 +33,10 @@ public class StationService {
         DateTime now = DateTime.now();
         Station station = BeanUtil.copyProperties(req, Station.class);
         if (ObjUtil.isNull(station.getId())) {
+            Station stationDB = stationMapper.selectOne(station);
+            if (ObjUtil.isNotNull(stationDB))
+                throw new BusinessException(BusinessExceptionEnum.BUSINESS_STATION_NAME_UNIQUE_ERROR);
+
             station.setId(snowFlake.nextId());
             station.setCreateTime(now);
             station.setUpdateTime(now);
