@@ -3,9 +3,8 @@ package cn.anlper.train.config;
 import cn.anlper.train.job.TestJob;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
+//@Configuration
 public class QuartzConfig {
 
     @Bean
@@ -22,7 +21,7 @@ public class QuartzConfig {
                 .forJob(jobDetail)
                 .withIdentity("trigger", "trigger")
                 .startNow()
-                .withSchedule(CronScheduleBuilder.cronSchedule("*/2 * * * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("*/5 * * * * ?"))
                 .build();
     }
 }
