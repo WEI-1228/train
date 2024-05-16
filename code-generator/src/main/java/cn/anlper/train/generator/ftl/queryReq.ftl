@@ -1,6 +1,7 @@
 package cn.anlper.train.req;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Date;
