@@ -4,12 +4,13 @@ import cn.anlper.train.entities.DailyTrainStation;
 import cn.anlper.train.mapper.DailyTrainStationMapper;
 import cn.anlper.train.req.DailyTrainStationQueryReq;
 import cn.anlper.train.req.DailyTrainStationSaveReq;
-import cn.anlper.train.resp.PageResp;
 import cn.anlper.train.resp.DailyTrainStationQueryResp;
+import cn.anlper.train.resp.PageResp;
 import cn.anlper.train.utils.SnowFlake;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
@@ -44,6 +45,14 @@ public class DailyTrainStationService {
 
     public PageResp queryList(DailyTrainStationQueryReq req) {
         Example example = new Example(DailyTrainStation.class);
+        example.setOrderByClause("daily_date desc, train_code asc, indexes asc");
+        Example.Criteria criteria = example.createCriteria();
+        if (StrUtil.isNotEmpty(req.getTrainCode())) {
+            criteria.andEqualTo("trainCode", req.getTrainCode());
+        }
+        if (ObjUtil.isNotEmpty(req.getDailyDate())) {
+            criteria.andEqualTo("dailyDate", req.getDailyDate());
+        }
         PageHelper.startPage(req.getPage(), req.getSize());
 
         log.info("查询页码：{}", req.getPage());
