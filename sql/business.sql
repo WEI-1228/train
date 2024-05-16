@@ -77,7 +77,7 @@ create table `train_seat` (
 drop table if exists `daily_train`;
 create table `daily_train` (
   `id` bigint not null comment 'id',
-  `date` date not null comment '日期',
+  `daily_date` date not null comment '日期',
   `code` varchar(20) not null comment '车次编号',
   `type` char(1) not null comment '车次类型|枚举[TrainTypeEnum]',
   `start` varchar(20) not null comment '始发站',
@@ -89,15 +89,15 @@ create table `daily_train` (
   `create_time` datetime(3) comment '新增时间',
   `update_time` datetime(3) comment '修改时间',
   primary key (`id`),
-  unique key `date_code_unique` (`date`, `code`)
+  unique key `date_code_unique` (`daily_date`, `code`)
 ) engine=innodb default charset=utf8mb4 comment='每日车次';
 
 drop table if exists `daily_train_station`;
 create table `daily_train_station` (
   `id` bigint not null comment 'id',
-  `date` date not null comment '日期',
+  `daily_date` date not null comment '日期',
   `train_code` varchar(20) not null comment '车次编号',
-  `index` int not null comment '站序|第一站是0',
+  `indexes` int not null comment '站序|第一站是0',
   `name` varchar(20) not null comment '站名',
   `name_pinyin` varchar(50) not null comment '站名拼音',
   `in_time` time comment '进站时间',
@@ -107,16 +107,16 @@ create table `daily_train_station` (
   `create_time` datetime(3) comment '新增时间',
   `update_time` datetime(3) comment '修改时间',
   primary key (`id`),
-  unique key `date_train_code_index_unique` (`date`, `train_code`, `index`),
-  unique key `date_train_code_name_unique` (`date`, `train_code`, `name`)
+  unique key `date_train_code_index_unique` (`daily_date`, `train_code`, `indexes`),
+  unique key `date_train_code_name_unique` (`daily_date`, `train_code`, `name`)
 ) engine=innodb default charset=utf8mb4 comment='每日车站';
 
 drop table if exists `daily_train_carriage`;
 create table `daily_train_carriage` (
   `id` bigint not null comment 'id',
-  `date` date not null comment '日期',
+  `daily_date` date not null comment '日期',
   `train_code` varchar(20) not null comment '车次编号',
-  `index` int not null comment '箱序',
+  `indexes` int not null comment '箱序',
   `seat_type` char(1) not null comment '座位类型|枚举[SeatTypeEnum]',
   `seat_count` int not null comment '座位数',
   `row_count` int not null comment '排数',
@@ -124,17 +124,17 @@ create table `daily_train_carriage` (
   `create_time` datetime(3) comment '新增时间',
   `update_time` datetime(3) comment '修改时间',
   primary key (`id`),
-  unique key `date_train_code_index_unique` (`date`, `train_code`, `index`)
+  unique key `date_train_code_index_unique` (`daily_date`, `train_code`, `indexes`)
 ) engine=innodb default charset=utf8mb4 comment='每日车厢';
 
 drop table if exists `daily_train_seat`;
 create table `daily_train_seat` (
   `id` bigint not null comment 'id',
-  `date` date not null comment '日期',
+  `daily_date` date not null comment '日期',
   `train_code` varchar(20) not null comment '车次编号',
   `carriage_index` int not null comment '箱序',
-  `row` char(2) not null comment '排号|01, 02',
-  `col` char(1) not null comment '列号|枚举[SeatColEnum]',
+  `daily_row` char(2) not null comment '排号|01, 02',
+  `daily_col` char(1) not null comment '列号|枚举[SeatColEnum]',
   `seat_type` char(1) not null comment '座位类型|枚举[SeatTypeEnum]',
   `carriage_seat_index` int not null comment '同车箱座序',
   `sell` varchar(50) not null comment '售卖情况|将经过的车站用01拼接，0表示可卖，1表示已卖',
@@ -146,7 +146,7 @@ create table `daily_train_seat` (
 drop table if exists `daily_train_ticket`;
 create table `daily_train_ticket` (
   `id` bigint not null comment 'id',
-  `date` date not null comment '日期',
+  `daily_date` date not null comment '日期',
   `train_code` varchar(20) not null comment '车次编号',
   `start` varchar(20) not null comment '出发站',
   `start_pinyin` varchar(50) not null comment '出发站拼音',
@@ -167,7 +167,7 @@ create table `daily_train_ticket` (
   `create_time` datetime(3) comment '新增时间',
   `update_time` datetime(3) comment '修改时间',
   primary key (`id`),
-  unique key `date_train_code_start_end_unique` (`date`, `train_code`, `start`, `end`)
+  unique key `date_train_code_start_end_unique` (`daily_date`, `train_code`, `start`, `end`)
 ) engine=innodb default charset=utf8mb4 comment='余票信息';
 
 drop table if exists `confirm_order`;
