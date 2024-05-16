@@ -1,5 +1,6 @@
 package cn.anlper.train.service;
 
+import cn.anlper.train.controller.enums.SeatColEnum;
 import cn.anlper.train.entities.DailyTrainCarriage;
 import cn.anlper.train.mapper.DailyTrainCarriageMapper;
 import cn.anlper.train.req.DailyTrainCarriageQueryReq;
@@ -10,6 +11,7 @@ import cn.anlper.train.utils.SnowFlake;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
@@ -29,6 +31,11 @@ public class DailyTrainCarriageService {
     private SnowFlake snowFlake;
     public void save(DailyTrainCarriageSaveReq req) {
         DateTime now = DateTime.now();
+
+        List<SeatColEnum> colsByType = SeatColEnum.getColsByType(req.getSeatType());
+        req.setColCount(colsByType.size());
+        req.setSeatCount(req.getRowCount() * req.getColCount());
+
         DailyTrainCarriage dailyTrainCarriage = BeanUtil.copyProperties(req, DailyTrainCarriage.class);
         if (ObjUtil.isNull(dailyTrainCarriage.getId())) {
             dailyTrainCarriage.setId(snowFlake.nextId());
@@ -44,6 +51,14 @@ public class DailyTrainCarriageService {
 
     public PageResp queryList(DailyTrainCarriageQueryReq req) {
         Example example = new Example(DailyTrainCarriage.class);
+        example.setOrderByClause("daily_date desc, train_code asc, indexes asc");
+        Example.Criteria criteria = example.createCriteria();
+        if (StrUtil.isNotEmpty(req.getTrainCode())) {
+            criteria.andEqualTo("trainCode", req.getTrainCode());
+        }
+        if (ObjUtil.isNotEmpty(req.getDailyDate())) {
+            criteria.andEqualTo("dailyDate", req.getDailyDate());
+        }
         PageHelper.startPage(req.getPage(), req.getSize());
 
         log.info("查询页码：{}", req.getPage());
