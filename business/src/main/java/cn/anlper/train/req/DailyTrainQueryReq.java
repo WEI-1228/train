@@ -12,7 +12,7 @@ import java.util.Date;
 @ToString
 public class DailyTrainQueryReq extends PageReq {
     private Long id;
-    @JsonFormat(pattern = "yyyy-MM-dd hh:MM:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date dailyDate;
     private String code;
     private String type;

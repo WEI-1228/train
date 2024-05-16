@@ -38,7 +38,7 @@
            ok-text="确认" cancel-text="取消">
     <a-form :model="dailyTrain" :label-col="{span: 4}" :wrapper-col="{ span: 20 }">
       <a-form-item label="日期">
-        <a-date-picker v-model:value="dailyTrain.date" valueFormat="YYYY-MM-DD" placeholder="请选择日期" />
+        <a-date-picker v-model:value="dailyTrain.dailyDate" valueFormat="YYYY-MM-DD" placeholder="请选择日期" />
       </a-form-item>
       <a-form-item label="车次编号">
         <train-select-view v-model="dailyTrain.code" @change="onChangeCode"></train-select-view>
@@ -95,7 +95,7 @@ export default defineComponent({
     const visible = ref(false);
     let dailyTrain = ref({
       id: undefined,
-      date: undefined,
+      dailyDate: undefined,
       code: undefined,
       type: undefined,
       start: undefined,
@@ -119,15 +119,15 @@ export default defineComponent({
       code: null
     });
     const genDaily = ref({
-      date: null
+      daily_date: null
     });
     const genDailyVisible = ref(false);
     const genDailyLoading = ref(false);
     const columns = [
     {
       title: '日期',
-      dataIndex: 'date',
-      key: 'date',
+      dataIndex: 'dailyDate',
+      key: 'dailyDate',
     },
     {
       title: '车次编号',
@@ -229,7 +229,7 @@ export default defineComponent({
           page: param.page,
           size: param.size,
           code: params.value.code,
-          date: params.value.date
+          daily_date: params.value.daily_date
         }
       }).then((response) => {
         loading.value = false;
