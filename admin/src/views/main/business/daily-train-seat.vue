@@ -46,7 +46,7 @@ export default defineComponent({
     const visible = ref(false);
     let dailyTrainSeat = ref({
       id: undefined,
-      date: undefined,
+      dailyDate: undefined,
       trainCode: undefined,
       carriageIndex: undefined,
       row: undefined,
@@ -71,8 +71,8 @@ export default defineComponent({
     const columns = [
     {
       title: '日期',
-      dataIndex: 'date',
-      key: 'date',
+      dataIndex: 'dailyDate',
+      key: 'dailyDate',
     },
     {
       title: '车次编号',
