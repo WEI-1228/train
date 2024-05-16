@@ -1,7 +1,7 @@
 <template>
   <p>
     <a-space>
-      <a-date-picker v-model:value="params.date" valueFormat="YYYY-MM-DD" placeholder="请选择日期" />
+      <a-date-picker v-model:value="params.dailyDate" valueFormat="YYYY-MM-DD" placeholder="请选择日期" />
       <train-select-view v-model="params.trainCode" width="200px"></train-select-view>
       <a-button type="primary" @click="handleQuery()">刷新</a-button>
       <a-button type="primary" @click="onAdd">新增</a-button>
@@ -30,13 +30,13 @@
            ok-text="确认" cancel-text="取消">
     <a-form :model="dailyTrainStation" :label-col="{span: 4}" :wrapper-col="{ span: 20 }">
       <a-form-item label="日期">
-        <a-date-picker v-model:value="dailyTrainStation.date" valueFormat="YYYY-MM-DD" placeholder="请选择日期" />
+        <a-date-picker v-model:value="dailyTrainStation.dailyDate" valueFormat="YYYY-MM-DD" placeholder="请选择日期" />
       </a-form-item>
       <a-form-item label="车次编号">
         <train-select-view v-model="dailyTrainStation.trainCode"></train-select-view>
       </a-form-item>
       <a-form-item label="站序">
-        <a-input v-model:value="dailyTrainStation.index" />
+        <a-input v-model:value="dailyTrainStation.indexes" />
       </a-form-item>
       <a-form-item label="站名">
         <a-input v-model:value="dailyTrainStation.name" />
@@ -75,7 +75,7 @@ export default defineComponent({
     const visible = ref(false);
     let dailyTrainStation = ref({
       id: undefined,
-      date: undefined,
+      dailyDate: undefined,
       trainCode: undefined,
       indexes: undefined,
       name: undefined,
@@ -97,13 +97,13 @@ export default defineComponent({
     let loading = ref(false);
     let params = ref({
       trainCode: null,
-      date: null
+      dailyDate: null
     });
     const columns = [
     {
       title: '日期',
-      dataIndex: 'date',
-      key: 'date',
+      dataIndex: 'dailyDate',
+      key: 'dailyDate',
     },
     {
       title: '车次编号',
@@ -112,8 +112,8 @@ export default defineComponent({
     },
     {
       title: '站序',
-      dataIndex: 'index',
-      key: 'index',
+      dataIndex: 'indexes',
+      key: 'indexes',
     },
     {
       title: '站名',
@@ -224,7 +224,7 @@ export default defineComponent({
           page: param.page,
           size: param.size,
           trainCode: params.value.trainCode,
-          date: params.value.date
+          dailyDate: params.value.dailyDate
         }
       }).then((response) => {
         loading.value = false;
