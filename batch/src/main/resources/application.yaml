@@ -1,0 +1,30 @@
+server:
+  port: 8003
+  servlet:
+    context-path: "/batch"
+
+spring:
+  application:
+    name: train-batch-service
+
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://121.196.247.67/train_business?characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+    username: train
+    password: 258079
+  jackson:
+    date-format: "yyyy-MM-dd HH:mm:ss"
+    time-zone: "GMT+8"
+
+# ========================mybatis===================
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: cn.anlper.train.entities
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    cn.anlper.train.mapper: trace
