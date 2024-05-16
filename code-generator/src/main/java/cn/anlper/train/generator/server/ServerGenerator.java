@@ -48,6 +48,10 @@ public class ServerGenerator {
         param.put("Domain", Domain);
         param.put("domain", domain);
         param.put("do_main", do_main);
+        if (prefix.contains("admin")) {
+            param.put("admin_package", ".admin");
+            param.put("admin_prefix", "admin/");
+        }
         System.out.println("组装参数：" + param);
 
         FreemarkerUtil.initConfig(TYPE + ".ftl");

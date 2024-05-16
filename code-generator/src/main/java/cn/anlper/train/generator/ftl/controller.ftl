@@ -1,4 +1,4 @@
-package cn.anlper.train.controller;
+package cn.anlper.train.controller${admin_package};
 
 import cn.anlper.train.req.${Domain}QueryReq;
 import cn.anlper.train.req.${Domain}SaveReq;
@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/${do_main}")
+@RequestMapping("/${admin_prefix}${do_main}")
 public class ${Domain}Controller {
 
     @Resource
