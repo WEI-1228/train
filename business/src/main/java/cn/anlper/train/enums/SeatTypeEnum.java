@@ -1,4 +1,4 @@
-package cn.anlper.train.controller.enums;
+package cn.anlper.train.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

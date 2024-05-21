@@ -1,4 +1,4 @@
-package cn.anlper.train.controller.config;
+package cn.anlper.train.config;
 
 import cn.anlper.train.interceptor.MemberInterceptor;
 import jakarta.annotation.Resource;
