@@ -2,7 +2,7 @@
   <p>
     <a-space>
       <train-select-view v-model="params.trainCode" width="200px"></train-select-view>
-      <a-date-picker v-model:value="params.date" valueFormat="YYYY-MM-DD" placeholder="请选择日期"></a-date-picker>
+      <a-date-picker v-model:value="params.dailyDate" valueFormat="YYYY-MM-DD" placeholder="请选择日期"></a-date-picker>
       <station-select-view v-model="params.start" width="200px"></station-select-view>
       <station-select-view v-model="params.end" width="200px"></station-select-view>
       <a-button type="primary" @click="handleQuery()">查找</a-button>
@@ -88,7 +88,7 @@ export default defineComponent({
     const visible = ref(false);
     let dailyTrainTicket = ref({
       id: undefined,
-      date: undefined,
+      dailyDate: undefined,
       trainCode: undefined,
       start: undefined,
       startPinyin: undefined,
@@ -121,8 +121,8 @@ export default defineComponent({
     const columns = [
     {
       title: '日期',
-      dataIndex: 'date',
-      key: 'date',
+      dataIndex: 'dailyDate',
+      key: 'dailyDate',
     },
     {
       title: '车次编号',
@@ -237,7 +237,7 @@ export default defineComponent({
           page: param.page,
           size: param.size,
           trainCode: params.value.trainCode,
-          date: params.value.date,
+          dailyDate: params.value.dailyDate,
           start: params.value.start,
           end: params.value.end
         }

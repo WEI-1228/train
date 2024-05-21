@@ -18,6 +18,7 @@ import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.Date;
@@ -36,6 +37,8 @@ public class DailyTrainService {
     private DailyTrainCarriageService dailyTrainCarriageService;
     @Resource
     private DailyTrainSeatService dailyTrainSeatService;
+    @Resource
+    private DailyTrainTicketService dailyTrainTicketService;
 
     @Resource
     private SnowFlake snowFlake;
@@ -78,6 +81,8 @@ public class DailyTrainService {
      * 生成某日所有车次信息，包括车次、车站、车厢、座位
      * @param date
      */
+
+    @Transactional
     public void genDaily(Date date) {
         List<Train> trainList = trainService.selectAll();
         if (CollUtil.isEmpty(trainList)) {
@@ -90,6 +95,7 @@ public class DailyTrainService {
             dailyTrainStationService.genDailyTrainStation(date, train.getCode());
             dailyTrainCarriageService.genDailyTrainCarriage(date, train.getCode());
             dailyTrainSeatService.genDailyTrainSeat(date, train.getCode());
+            dailyTrainTicketService.genDailyTickets(date, train.getCode());
         }
     }
 
