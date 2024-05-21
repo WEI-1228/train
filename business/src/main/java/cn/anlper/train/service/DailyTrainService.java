@@ -95,7 +95,7 @@ public class DailyTrainService {
             dailyTrainStationService.genDailyTrainStation(date, train.getCode());
             dailyTrainCarriageService.genDailyTrainCarriage(date, train.getCode());
             dailyTrainSeatService.genDailyTrainSeat(date, train.getCode());
-            dailyTrainTicketService.genDailyTickets(date, train.getCode());
+            dailyTrainTicketService.genDailyTickets(train, date, train.getCode());
         }
     }
 

@@ -1,8 +1,10 @@
 package cn.anlper.train.service;
 
 import cn.anlper.train.entities.DailyTrainTicket;
+import cn.anlper.train.entities.Train;
 import cn.anlper.train.entities.TrainStation;
 import cn.anlper.train.enums.SeatTypeEnum;
+import cn.anlper.train.enums.TrainTypeEnum;
 import cn.anlper.train.mapper.DailyTrainTicketMapper;
 import cn.anlper.train.req.DailyTrainTicketQueryReq;
 import cn.anlper.train.resp.DailyTrainTicketQueryResp;
@@ -11,6 +13,7 @@ import cn.anlper.train.utils.SnowFlake;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.pagehelper.PageHelper;
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 
@@ -39,7 +43,7 @@ public class DailyTrainTicketService {
     private SnowFlake snowFlake;
 
     @Transactional
-    public void genDailyTickets(Date date, String trainCode) {
+    public void genDailyTickets(Train train, Date date, String trainCode) {
         log.info("生成日期【{}】，车次【{}】的余票信息开始", DateUtil.formatDate(date), trainCode);
         Example example = new Example(DailyTrainTicket.class);
         example.createCriteria()
@@ -56,9 +60,10 @@ public class DailyTrainTicketService {
 
         for (int i = 0; i < trainStationList.size(); i++) {
             TrainStation startStation = trainStationList.get(i);
+            BigDecimal sumKM = BigDecimal.ZERO;
             for (int j = i + 1; j < trainStationList.size(); j++) {
                 TrainStation endStation = trainStationList.get(j);
-
+                sumKM = sumKM.add(endStation.getKm());
                 DailyTrainTicket dailyTrainTicket = new DailyTrainTicket();
                 dailyTrainTicket.setId(snowFlake.nextId());
                 dailyTrainTicket.setDailyDate(date);
@@ -75,15 +80,21 @@ public class DailyTrainTicketService {
                 int edz = dailyTrainSeatService.countSeat(date, trainCode, SeatTypeEnum.EDZ.getCode());
                 int yw = dailyTrainSeatService.countSeat(date, trainCode, SeatTypeEnum.YW.getCode());
                 int rw = dailyTrainSeatService.countSeat(date, trainCode, SeatTypeEnum.RW.getCode());
-
+                // 票价 = 里程数 * 座位单价 * 车次类型系数
+                String trainType = train.getType();
+                BigDecimal priceRate = EnumUtil.getFieldBy(TrainTypeEnum::getPriceRate, TrainTypeEnum::getCode, trainType);
+                BigDecimal ydzPrice = sumKM.multiply(SeatTypeEnum.YDZ.getPrice()).multiply(priceRate).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal edzPrice = sumKM.multiply(SeatTypeEnum.EDZ.getPrice()).multiply(priceRate).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal ywPrice = sumKM.multiply(SeatTypeEnum.YW.getPrice()).multiply(priceRate).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal rwPrice = sumKM.multiply(SeatTypeEnum.RW.getPrice()).multiply(priceRate).setScale(2, RoundingMode.HALF_UP);
                 dailyTrainTicket.setYdz(ydz);
-                dailyTrainTicket.setYdzPrice(BigDecimal.ZERO);
+                dailyTrainTicket.setYdzPrice(ydzPrice);
                 dailyTrainTicket.setEdz(edz);
-                dailyTrainTicket.setEdzPrice(BigDecimal.ZERO);
+                dailyTrainTicket.setEdzPrice(edzPrice);
                 dailyTrainTicket.setRw(yw);
-                dailyTrainTicket.setRwPrice(BigDecimal.ZERO);
+                dailyTrainTicket.setRwPrice(rwPrice);
                 dailyTrainTicket.setYw(rw);
-                dailyTrainTicket.setYwPrice(BigDecimal.ZERO);
+                dailyTrainTicket.setYwPrice(ywPrice);
                 dailyTrainTicket.setCreateTime(now);
                 dailyTrainTicket.setUpdateTime(now);
                 dailyTrainTicketMapper.insert(dailyTrainTicket);
