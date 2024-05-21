@@ -13,9 +13,9 @@
     <template #bodyCell="{ column, record }">
       <template v-if="column.dataIndex === 'operation'">
       </template>
-      <template v-else-if="column.dataIndex === 'col'">
+      <template v-else-if="column.dataIndex === 'dailyCol'">
         <span v-for="item in SEAT_COL_ARRAY" :key="item.code">
-          <span v-if="item.code === record.col && item.type === record.seatType">
+          <span v-if="item.code === record.dailyCol && item.type === record.seatType">
             {{item.desc}}
           </span>
         </span>
@@ -49,8 +49,8 @@ export default defineComponent({
       dailyDate: undefined,
       trainCode: undefined,
       carriageIndex: undefined,
-      row: undefined,
-      col: undefined,
+      dailyRow: undefined,
+      dailyCol: undefined,
       seatType: undefined,
       carriageSeatIndex: undefined,
       sell: undefined,
@@ -86,13 +86,13 @@ export default defineComponent({
     },
     {
       title: '排号',
-      dataIndex: 'row',
-      key: 'row',
+      dataIndex: 'dailyRow',
+      key: 'dailyRow',
     },
     {
       title: '列号',
-      dataIndex: 'col',
-      key: 'col',
+      dataIndex: 'dailyCol',
+      key: 'dailyCol',
     },
     {
       title: '座位类型',

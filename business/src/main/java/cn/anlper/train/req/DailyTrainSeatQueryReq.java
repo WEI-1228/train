@@ -16,8 +16,9 @@ public class DailyTrainSeatQueryReq extends PageReq {
     private Date dailyDate;
     private String trainCode;
     private Integer carriageIndex;
-    private String seatRow;
-    private String seatCol;
+    private String dailyRow;
+    private String dailyCol;
     private String seatType;
     private Integer carriageSeatIndex;
+    private String sell;
 }
