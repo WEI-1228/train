@@ -11,6 +11,7 @@ import cn.anlper.train.utils.SnowFlake;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -29,6 +30,8 @@ public class DailyTrainService {
     private DailyTrainMapper dailyTrainMapper;
     @Resource
     private TrainService trainService;
+    @Resource
+    private DailyTrainStationService dailyTrainStationService;
 
     @Resource
     private SnowFlake snowFlake;
@@ -80,11 +83,12 @@ public class DailyTrainService {
 
         for (Train train: trainList) {
             genDailyTrain(date, train);
-
+            dailyTrainStationService.genDailyTrainStation(date, train.getCode());
         }
     }
 
     public void genDailyTrain(Date date, Train train) {
+        log.info("开始生成日期【{}】，车次【{}】的信息", DateUtil.formatDate(date), train.getCode());
         // 删除该车次当天已有的数据
         Example example = new Example(DailyTrain.class);
         example.createCriteria()
@@ -100,5 +104,6 @@ public class DailyTrainService {
         dailyTrain.setCreateTime(now);
         dailyTrain.setUpdateTime(now);
         dailyTrainMapper.insert(dailyTrain);
+        log.info("生成日期【{}】，车次【{}】的信息结束", DateUtil.formatDate(date), train.getCode());
     }
 }

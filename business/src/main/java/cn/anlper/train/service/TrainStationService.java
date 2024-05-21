@@ -68,4 +68,11 @@ public class TrainStationService {
     public void delete(Long id) {
         trainStationMapper.deleteByPrimaryKey(id);
     }
+
+    public List<TrainStation> selectByTrainCode(String trainCode) {
+        Example example = new Example(TrainStation.class);
+        example.setOrderByClause("indexes asc");
+        example.createCriteria().andEqualTo("trainCode", trainCode);
+        return trainStationMapper.selectByExample(example);
+    }
 }
