@@ -116,6 +116,8 @@ public class DailyTrainSeatService {
                 .andEqualTo("dailyDate", date)
                 .andEqualTo("trainCode", trainCode)
                 .andEqualTo("seatType", seatType);
-        return dailyTrainSeatMapper.selectCountByExample(example);
+        int i = dailyTrainSeatMapper.selectCountByExample(example);
+        if (i == 0) return -1;
+        return i;
     }
 }
