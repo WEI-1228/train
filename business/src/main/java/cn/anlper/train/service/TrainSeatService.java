@@ -105,4 +105,10 @@ public class TrainSeatService {
             }
         }
     }
+
+    public List<TrainSeat> selectSeatByTrainCode(String trainCode) {
+        Example example = new Example(TrainSeat.class);
+        example.createCriteria().andEqualTo("trainCode", trainCode);
+        return trainSeatMapper.selectByExample(example);
+    }
 }
