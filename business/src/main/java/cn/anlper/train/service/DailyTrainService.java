@@ -32,6 +32,8 @@ public class DailyTrainService {
     private TrainService trainService;
     @Resource
     private DailyTrainStationService dailyTrainStationService;
+    @Resource
+    private DailyTrainCarriageService dailyTrainCarriageService;
 
     @Resource
     private SnowFlake snowFlake;
@@ -84,6 +86,7 @@ public class DailyTrainService {
         for (Train train: trainList) {
             genDailyTrain(date, train);
             dailyTrainStationService.genDailyTrainStation(date, train.getCode());
+            dailyTrainCarriageService.genDailyTrainCarriage(date, train.getCode());
         }
     }
 
