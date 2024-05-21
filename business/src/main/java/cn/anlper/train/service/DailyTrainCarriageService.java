@@ -1,6 +1,6 @@
 package cn.anlper.train.service;
 
-import cn.anlper.train.controller.enums.SeatColEnum;
+import cn.anlper.train.enums.SeatColEnum;
 import cn.anlper.train.entities.DailyTrainCarriage;
 import cn.anlper.train.mapper.DailyTrainCarriageMapper;
 import cn.anlper.train.req.DailyTrainCarriageQueryReq;
