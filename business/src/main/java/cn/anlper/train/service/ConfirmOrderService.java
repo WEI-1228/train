@@ -11,16 +11,23 @@ import cn.anlper.train.exception.BusinessException;
 import cn.anlper.train.exception.BusinessExceptionEnum;
 import cn.anlper.train.mapper.ConfirmOrderMapper;
 import cn.anlper.train.req.ConfirmOrderDoReq;
+import cn.anlper.train.req.ConfirmOrderQueryReq;
 import cn.anlper.train.req.ConfirmOrderTicketReq;
+import cn.anlper.train.resp.ConfirmOrderQueryResp;
+import cn.anlper.train.resp.PageResp;
 import cn.anlper.train.utils.SnowFlake;
 import cn.anlper.train.utils.TrainUtil;
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -287,6 +294,16 @@ public class ConfirmOrderService {
                 }
             }
         }
+    }
+
+    public PageResp queryList(ConfirmOrderQueryReq req) {
+        Example example = new Example(ConfirmOrder.class);
+        example.setOrderByClause("update_time desc");
+        PageHelper.startPage(req.getPage(), req.getSize());
+        List<ConfirmOrder> confirmOrders = confirmOrderMapper.selectByExample(example);
+        List<ConfirmOrderQueryResp> confirmOrderQueryResps = BeanUtil.copyToList(confirmOrders, ConfirmOrderQueryResp.class);
+        PageInfo<ConfirmOrder> pageInfo = new PageInfo<>(confirmOrders);
+        return new PageResp<>(confirmOrderQueryResps, pageInfo.getTotal());
     }
 
 }
