@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.ToString;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -19,7 +18,7 @@ public class TicketQueryResp {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long passengerId;
     private String passengerName;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date trainDate;
     private String trainCode;
     private Integer carriageIndex;
@@ -32,4 +31,6 @@ public class TicketQueryResp {
     @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
     private String seatType;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createTime;
 }
