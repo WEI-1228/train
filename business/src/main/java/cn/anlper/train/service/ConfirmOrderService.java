@@ -2,6 +2,7 @@ package cn.anlper.train.service;
 
 import cn.anlper.train.context.LoginMemberContext;
 import cn.anlper.train.entities.ConfirmOrder;
+import cn.anlper.train.entities.DailyTrainTicket;
 import cn.anlper.train.enums.ConfirmOrderStatusEnum;
 import cn.anlper.train.mapper.ConfirmOrderMapper;
 import cn.anlper.train.req.ConfirmOrderDoReq;
@@ -18,6 +19,8 @@ import java.util.Date;
 public class ConfirmOrderService {
     @Resource
     private ConfirmOrderMapper confirmOrderMapper;
+    @Resource
+    private DailyTrainTicketService dailyTrainTicketService;
 
     @Resource
     private SnowFlake snowFlake;
@@ -41,7 +44,8 @@ public class ConfirmOrderService {
         confirmOrderMapper.insert(confirmOrder);
 
         // 查出余票记录，需要得到真实库存
-
+        DailyTrainTicket dailyTrainTicket = dailyTrainTicketService.selectByUnique(req.getDate(), req.getTrainCode(), req.getStart(), req.getEnd());
+        log.info("查出余票记录：{}", JSON.toJSONString(dailyTrainTicket));
         // 扣减余票数量
 
         // 选座

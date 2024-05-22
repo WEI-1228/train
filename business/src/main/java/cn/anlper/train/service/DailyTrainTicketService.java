@@ -129,4 +129,14 @@ public class DailyTrainTicketService {
         List<DailyTrainTicketQueryResp> ticketQueryResps = BeanUtil.copyToList(dailyTrainTickets, DailyTrainTicketQueryResp.class);
         return new PageResp<>(ticketQueryResps, pageInfo.getTotal());
     }
+
+    public DailyTrainTicket selectByUnique(Date date, String trainCode, String start, String end) {
+        Example example = new Example(DailyTrainTicket.class);
+        example.createCriteria()
+                .andEqualTo("dailyDate", date)
+                .andEqualTo("trainCode", trainCode)
+                .andEqualTo("start",  start)
+                .andEqualTo("end", end);
+        return dailyTrainTicketMapper.selectOneByExample(example);
+    }
 }
