@@ -1,9 +1,14 @@
 package cn.anlper.train.service;
 
+import cn.anlper.train.context.LoginMemberContext;
+import cn.anlper.train.controller.feign.MemberFeign;
 import cn.anlper.train.entities.DailyTrainSeat;
 import cn.anlper.train.entities.DailyTrainTicket;
 import cn.anlper.train.mapper.CustDailyTrainTicketMapper;
 import cn.anlper.train.mapper.DailyTrainSeatMapper;
+import cn.anlper.train.req.ConfirmOrderTicketReq;
+import cn.anlper.train.req.MemberTicketSaveReq;
+import cn.anlper.train.resp.CommonResp;
 import cn.anlper.train.utils.SnowFlake;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +26,17 @@ public class AfterConfirmOrderService {
     private DailyTrainSeatMapper dailyTrainSeatMapper;
     @Resource
     private CustDailyTrainTicketMapper custDailyTrainTicketMapper;
+    @Resource
+    private MemberFeign memberFeign;
 
     @Resource
     private SnowFlake snowFlake;
 
     @Transactional
-    public void afterDoConfirm(List<DailyTrainSeat> finalSelectedSeatList, DailyTrainTicket dailyTrainTicket) {
-        for (DailyTrainSeat dailyTrainSeat : finalSelectedSeatList) {
+    public void afterDoConfirm(List<DailyTrainSeat> finalSelectedSeatList, DailyTrainTicket dailyTrainTicket,
+                               List<ConfirmOrderTicketReq> tickets) {
+        for (int i = 0; i < finalSelectedSeatList.size(); i++) {
+            DailyTrainSeat dailyTrainSeat = finalSelectedSeatList.get(i);
             // 修改座位表售卖情况sell
             DailyTrainSeat updateSeat = new DailyTrainSeat();
             updateSeat.setId(dailyTrainSeat.getId());
@@ -57,14 +66,31 @@ public class AfterConfirmOrderService {
                     dailyTrainSeat.getSeatType(),
                     minStart, maxStart, minEnd, maxEnd
             );
+            // 为会员增加购票记录
+            MemberTicketSaveReq memberTicketSaveReq = new MemberTicketSaveReq();
+            memberTicketSaveReq.setMemberId(LoginMemberContext.getId());
+            memberTicketSaveReq.setPassengerId(tickets.get(i).getPassengerId());
+            memberTicketSaveReq.setPassengerName(tickets.get(i).getPassengerName());
+            memberTicketSaveReq.setTrainDate(dailyTrainTicket.getDailyDate());
+            memberTicketSaveReq.setTrainCode(dailyTrainTicket.getTrainCode());
+            memberTicketSaveReq.setCarriageIndex(dailyTrainSeat.getCarriageIndex());
+            memberTicketSaveReq.setSeatRow(dailyTrainSeat.getDailyRow());
+            memberTicketSaveReq.setSeatCol(dailyTrainSeat.getDailyCol());
+            memberTicketSaveReq.setStartStation(dailyTrainTicket.getStart());
+            memberTicketSaveReq.setStartTime(dailyTrainTicket.getStartTime());
+            memberTicketSaveReq.setEndStation(dailyTrainTicket.getEnd());
+            memberTicketSaveReq.setEndTime(dailyTrainTicket.getEndTime());
+            memberTicketSaveReq.setSeatType(dailyTrainSeat.getSeatType());
+
+            CommonResp commonResp = memberFeign.save(memberTicketSaveReq);
+            log.info("调用Member接口保存订单信息，返回：{}", commonResp);
+            // 更新确认订单为成功
         }
 
 
 
 
-            // 为会员增加购票记录
 
-            // 更新确认订单为成功
     }
 
 }
