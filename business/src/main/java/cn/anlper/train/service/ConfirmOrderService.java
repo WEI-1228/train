@@ -38,6 +38,8 @@ public class ConfirmOrderService {
     private DailyTrainCarriageService dailyTrainCarriageService;
     @Resource
     private DailyTrainSeatService dailyTrainSeatService;
+    @Resource
+    private AfterConfirmOrderService afterConfirmOrderService;
 
     @Resource
     private SnowFlake snowFlake;
@@ -71,13 +73,17 @@ public class ConfirmOrderService {
         log.info("查出余票记录：{}", JSON.toJSONString(dailyTrainTicket));
         // 扣减余票数量
         reduceTickets(req, dailyTrainTicket);
+        Integer startIndex = dailyTrainTicket.getStartIndex();
+        Integer endIndex = dailyTrainTicket.getEndIndex();
+
+        // 挑选符合条件的座位
 
         // 计算所有座位相对第一个座位的相对偏移量，方便后续选座
         ConfirmOrderTicketReq ticketReq0 = tickets.get(0);
         String seat = ticketReq0.getSeat();
         // 必须在外面初始化，不能通过查询的返回，因为我们不能选择已经选过的座位
         // 在连选情况下在外面初始化没问题，单选情况下就很麻烦，直接传入更简单
-        List<DailyTrainSeat> selectedSeatList = new ArrayList<>();
+        List<DailyTrainSeat> finalSelectedSeatList = new ArrayList<>();
         if (StrUtil.isNotBlank(seat)) {
             log.info("本次购票有选座，第一张票的座位是：{}", ticketReq0.getSeat());
             String seatTypeCode = ticketReq0.getSeatTypeCode();
@@ -89,24 +95,31 @@ public class ConfirmOrderService {
             }
             log.info("本次选票的相对序号为：{}", offsetList);
             // 选座
-             getSeat(selectedSeatList, date, trainCode, seatTypeCode, ticketReq0.getSeat().substring(0, 1), offsetList,
-                    dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
+             getSeat(finalSelectedSeatList, date, trainCode, seatTypeCode, ticketReq0.getSeat().substring(0, 1), offsetList,
+                     startIndex, endIndex);
 
         } else {
             log.info("本次购票没有选座");
             // 选座
             for (ConfirmOrderTicketReq ticket: tickets) {
-                getSeat(selectedSeatList, date, trainCode, ticket.getSeatTypeCode(), null, null,
-                        dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
+                getSeat(finalSelectedSeatList, date, trainCode, ticket.getSeatTypeCode(), null, null,
+                        startIndex, endIndex);
             }
         }
         log.info("最终的连选情况：");
-        selectedSeatList.forEach(s-> log.info("{}", s.getDailyRow() + s.getDailyCol()));
+        finalSelectedSeatList.forEach(s-> log.info("{}", s.getDailyRow() + s.getDailyCol()));
 
-
-            // 挑选符合条件的座位
+        // 修改选中座位的sell字段
+        for (DailyTrainSeat dailyTrainSeat : finalSelectedSeatList) {
+            char[] charArray = dailyTrainSeat.getSell().toCharArray();
+            for (int i = startIndex; i < endIndex; i++)
+                charArray[i - 1] = '1';
+            String newSell = new String(charArray);
+            dailyTrainSeat.setSell(newSell);
+        }
 
         // 选中的座位做事务处理：
+        afterConfirmOrderService.afterDoConfirm(finalSelectedSeatList);
 
             // 修改座位表售卖情况sell
 
