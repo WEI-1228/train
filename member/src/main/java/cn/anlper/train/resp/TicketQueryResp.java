@@ -19,7 +19,7 @@ public class TicketQueryResp {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long passengerId;
     private String passengerName;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date trainDate;
     private String trainCode;
     private Integer carriageIndex;

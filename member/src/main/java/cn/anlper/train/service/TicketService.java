@@ -1,5 +1,6 @@
 package cn.anlper.train.service;
 
+import cn.anlper.train.context.LoginMemberContext;
 import cn.anlper.train.entities.Ticket;
 import cn.anlper.train.mapper.TicketMapper;
 import cn.anlper.train.req.MemberTicketSaveReq;
@@ -37,6 +38,8 @@ public class TicketService {
 
     public PageResp queryList(TicketQueryReq req) {
         Example example = new Example(Ticket.class);
+        Long id = LoginMemberContext.getId();
+        example.createCriteria().andEqualTo("memberId", id);
         PageHelper.startPage(req.getPage(), req.getSize());
 
         log.info("查询页码：{}", req.getPage());

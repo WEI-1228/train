@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/admin/ticket")
+@RequestMapping("/ticket")
 public class TicketController {
 
     @Resource
