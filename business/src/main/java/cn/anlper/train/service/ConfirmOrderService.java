@@ -14,6 +14,7 @@ import cn.anlper.train.req.ConfirmOrderDoReq;
 import cn.anlper.train.req.ConfirmOrderTicketReq;
 import cn.anlper.train.utils.SnowFlake;
 import cn.anlper.train.utils.TrainUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
@@ -126,12 +127,50 @@ public class ConfirmOrderService {
             log.info("开始从车厢{}选座", dailyTrainCarriage.getIndexes());
             List<DailyTrainSeat> dailyTrainSeats = dailyTrainSeatService.selectByCarriage(date, trainCode, dailyTrainCarriage.getIndexes());
             log.info("{}号车厢的座位数：{}", dailyTrainCarriage.getIndexes(), dailyTrainSeats.size());
-            for (DailyTrainSeat dailyTrainSeat : dailyTrainSeats) {
-                boolean isChoose = calSell(dailyTrainSeat, startIndex, endIndex);
-                if (isChoose) {
-                    log.info("选票成功，座位号是：{}", dailyTrainSeat.getCarriageSeatIndex());
-                    break;
+            for (int i = 0; i < dailyTrainSeats.size(); i++) {
+                boolean isChoose = true;
+                DailyTrainSeat dailyTrainSeat = dailyTrainSeats.get(i);
+                // 首先判断是否选座，如果选座，判断当前座位的列是否匹配
+                if (StrUtil.isNotEmpty(column)) {
+                    // 不匹配就直接跳过
+                    if (!column.equals(dailyTrainSeat.getDailyCol())) {
+                        log.info("{}号座位的座位号为{}, 与目标{}不一致，不可选中", i + 1, dailyTrainSeat.getDailyCol(), column);
+                        continue;
+                    }
                 }
+                isChoose = calSell(dailyTrainSeat, startIndex, endIndex);
+                // 第一个座位
+                if (isChoose) {
+                    log.info("选票成功，座位号是：{}{}", dailyTrainSeat.getDailyRow(), dailyTrainSeat.getDailyCol());
+                } else {
+                    log.info("选票失败");
+                    continue;
+                }
+                if (CollUtil.isEmpty(offsetList) || offsetList.size() == 1) return;
+                log.info("需要选多张票，偏移值为：{}, 开始尝试连选", offsetList);
+                boolean success = true;
+                for (int j = 1; j < offsetList.size(); j++) {
+                    if (i + j >= dailyTrainSeats.size()) {
+                        success = false;
+                        log.info("无法继续选座，当前车厢已无可选座位，选座失败");
+                        break;
+                    }
+                    int offset = offsetList.get(j);
+                    boolean isChooseNext = calSell(dailyTrainSeats.get(i + offset), startIndex, endIndex);
+                    if (isChooseNext) {
+                        log.info("第{}张票选座成功，座位号为{}{}", j + 1,
+                                dailyTrainSeats.get(i + offset).getDailyRow(), dailyTrainSeats.get(i + offset).getDailyCol());
+                    } else {
+                        success = false;
+                        log.info("第{}张票选座失败，整体选座失败", j + 1);
+                    }
+                }
+                if (success) {
+                    log.info("连选成功");
+                    // 保存选好的座位
+                    return;
+                }
+
             }
         }
     }
@@ -142,15 +181,27 @@ public class ConfirmOrderService {
         String sell = dailyTrainSeat.getSell();
         String sellPart = sell.substring(startIndex - 1, endIndex - 1);
         if (Integer.parseInt(sellPart) > 0) {
-            log.info("{}号座位在本站区间{}~{}已售过票，不可选中", dailyTrainSeat.getCarriageSeatIndex(), startIndex, endIndex);
+            log.info("{}号座位（{}{}）在本站区间{}~{}已售过票，不可选中",
+                    dailyTrainSeat.getCarriageSeatIndex(),
+                    dailyTrainSeat.getDailyRow(),
+                    dailyTrainSeat.getDailyCol(),
+                    startIndex, endIndex);
             return false;
         } else {
-            log.info("{}号座位在本站区间{}~{}未售过票，可选中该座位", dailyTrainSeat.getCarriageSeatIndex(), startIndex, endIndex);
+            log.info("{}号座位（{}{}）在本站区间{}~{}未售过票，可选中该座位",
+                    dailyTrainSeat.getCarriageSeatIndex(),
+                    dailyTrainSeat.getDailyRow(),
+                    dailyTrainSeat.getDailyCol(),
+                    startIndex, endIndex);
             char[] charArray = sell.toCharArray();
             for (int i = startIndex; i < endIndex; i++)
                 charArray[i - 1] = '1';
             String newSell = new String(charArray);
-            log.info("完成选座，{}号座位的售卖情况发生变化：{} -> {}", dailyTrainSeat.getCarriageSeatIndex(), sell, newSell);
+            log.info("完成选座，{}号座位（{}{}）的售卖情况发生变化：{} -> {}",
+                    dailyTrainSeat.getCarriageSeatIndex(),
+                    dailyTrainSeat.getDailyRow(),
+                    dailyTrainSeat.getDailyCol(),
+                    sell, newSell);
             return true;
         }
     }
