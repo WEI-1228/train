@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.anlper.train.mapper.TicketMapper">
+  <resultMap id="BaseResultMap" type="cn.anlper.train.entities.Ticket">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="member_id" jdbcType="BIGINT" property="memberId" />
+    <result column="passenger_id" jdbcType="BIGINT" property="passengerId" />
+    <result column="passenger_name" jdbcType="VARCHAR" property="passengerName" />
+    <result column="train_date" jdbcType="DATE" property="trainDate" />
+    <result column="train_code" jdbcType="VARCHAR" property="trainCode" />
+    <result column="carriage_index" jdbcType="INTEGER" property="carriageIndex" />
+    <result column="seat_row" jdbcType="CHAR" property="seatRow" />
+    <result column="seat_col" jdbcType="CHAR" property="seatCol" />
+    <result column="start_station" jdbcType="VARCHAR" property="startStation" />
+    <result column="start_time" jdbcType="TIME" property="startTime" />
+    <result column="end_station" jdbcType="VARCHAR" property="endStation" />
+    <result column="end_time" jdbcType="TIME" property="endTime" />
+    <result column="seat_type" jdbcType="CHAR" property="seatType" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+</mapper>
