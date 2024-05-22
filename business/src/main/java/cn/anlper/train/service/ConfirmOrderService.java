@@ -2,6 +2,8 @@ package cn.anlper.train.service;
 
 import cn.anlper.train.context.LoginMemberContext;
 import cn.anlper.train.entities.ConfirmOrder;
+import cn.anlper.train.entities.DailyTrainCarriage;
+import cn.anlper.train.entities.DailyTrainSeat;
 import cn.anlper.train.entities.DailyTrainTicket;
 import cn.anlper.train.enums.ConfirmOrderStatusEnum;
 import cn.anlper.train.enums.SeatTypeEnum;
@@ -30,6 +32,10 @@ public class ConfirmOrderService {
     private ConfirmOrderMapper confirmOrderMapper;
     @Resource
     private DailyTrainTicketService dailyTrainTicketService;
+    @Resource
+    private DailyTrainCarriageService dailyTrainCarriageService;
+    @Resource
+    private DailyTrainSeatService dailyTrainSeatService;
 
     @Resource
     private SnowFlake snowFlake;
@@ -71,20 +77,21 @@ public class ConfirmOrderService {
             log.info("本次购票有选座，第一张票的座位是：{}", ticketReq0.getSeat());
             String seatTypeCode = ticketReq0.getSeatTypeCode();
             log.info("本次购票选的是{}等座", seatTypeCode);
-            List<Integer> absOffsetList = new ArrayList<>();
+            List<Integer> offsetList = new ArrayList<>();
             int firstIndex = TrainUtil.getIndex(seatTypeCode, ticketReq0.getSeat());
             for (ConfirmOrderTicketReq ticket: tickets) {
-                absOffsetList.add(TrainUtil.getIndex(seatTypeCode, ticket.getSeat()) - firstIndex);
+                offsetList.add(TrainUtil.getIndex(seatTypeCode, ticket.getSeat()) - firstIndex);
             }
-            log.info("本次选票的相对序号为：{}", absOffsetList);
+            log.info("本次选票的相对序号为：{}", offsetList);
+            // 选座
+            getSeat(date, trainCode, seatTypeCode, ticketReq0.getSeat().substring(0, 1), offsetList);
         } else {
             log.info("本次购票没有选座");
-
+            // 选座
+            for (ConfirmOrderTicketReq ticket: tickets) {
+                getSeat(date, trainCode, ticket.getSeatTypeCode(), null, null);
+            }
         }
-
-        // 选座
-
-            // 一个车厢一个车厢的获取座位数据
 
             // 挑选符合条件的座位
 
@@ -97,6 +104,26 @@ public class ConfirmOrderService {
             // 为会员增加购票记录
 
             // 更新确认订单为成功
+    }
+
+    /**
+     * 如果选座了，就一次选出所有座位，否则一个一个选，因为车厢可能不同
+     * TODO 如果没有选座，但都是同一类型的车厢，可以进行优化
+     * @param date
+     * @param trainCode
+     * @param seatType
+     * @param column
+     * @param offsetList
+     */
+    private void getSeat(Date date, String trainCode, String seatType, String column, List<Integer> offsetList) {
+        List<DailyTrainCarriage> dailyTrainCarriageList = dailyTrainCarriageService.selectBySeatType(date, trainCode, seatType);
+        log.info("共查出{}个符合条件的车厢", dailyTrainCarriageList.size());
+        for (DailyTrainCarriage dailyTrainCarriage: dailyTrainCarriageList) {
+            // 一个车厢一个车厢的获取座位数据
+            log.info("开始从车厢{}选座", dailyTrainCarriage.getIndexes());
+            List<DailyTrainSeat> dailyTrainSeats = dailyTrainSeatService.selectByCarriage(date, trainCode, dailyTrainCarriage.getIndexes());
+            log.info("{}号车厢的座位数：{}", dailyTrainCarriage.getIndexes(), dailyTrainSeats.size());
+        }
     }
 
     private static void reduceTickets(ConfirmOrderDoReq req, DailyTrainTicket dailyTrainTicket) {
