@@ -10,7 +10,9 @@ public enum BusinessExceptionEnum {
     MEMBER_MOBILE_NOT_EXIST("请先获取短信验证码"),
     MEMBER_MOBILE_CODE_ERROR("验证码错误"),
 
-    BUSINESS_STATION_NAME_UNIQUE_ERROR("车站已存在");
+    BUSINESS_STATION_NAME_UNIQUE_ERROR("车站已存在"),
+
+    CONFIRM_ORDER_TICKET_COUNT_ERROR("余票不足");
     private final String desc;
 
 }
