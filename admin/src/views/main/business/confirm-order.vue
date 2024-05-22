@@ -88,7 +88,7 @@ export default defineComponent({
     },
     {
       title: '车票',
-      dataIndex: 'tickets',
+      dataIndex: 'tickets22',
       key: 'tickets',
     },
     {
