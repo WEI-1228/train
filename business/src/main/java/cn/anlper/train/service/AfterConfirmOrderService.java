@@ -2,8 +2,11 @@ package cn.anlper.train.service;
 
 import cn.anlper.train.context.LoginMemberContext;
 import cn.anlper.train.controller.feign.MemberFeign;
+import cn.anlper.train.entities.ConfirmOrder;
 import cn.anlper.train.entities.DailyTrainSeat;
 import cn.anlper.train.entities.DailyTrainTicket;
+import cn.anlper.train.enums.ConfirmOrderStatusEnum;
+import cn.anlper.train.mapper.ConfirmOrderMapper;
 import cn.anlper.train.mapper.CustDailyTrainTicketMapper;
 import cn.anlper.train.mapper.DailyTrainSeatMapper;
 import cn.anlper.train.req.ConfirmOrderTicketReq;
@@ -28,13 +31,15 @@ public class AfterConfirmOrderService {
     private CustDailyTrainTicketMapper custDailyTrainTicketMapper;
     @Resource
     private MemberFeign memberFeign;
+    @Resource
+    private ConfirmOrderMapper confirmOrderMapper;
 
     @Resource
     private SnowFlake snowFlake;
 
     @Transactional
     public void afterDoConfirm(List<DailyTrainSeat> finalSelectedSeatList, DailyTrainTicket dailyTrainTicket,
-                               List<ConfirmOrderTicketReq> tickets) {
+                               List<ConfirmOrderTicketReq> tickets, ConfirmOrder confirmOrder) {
         for (int i = 0; i < finalSelectedSeatList.size(); i++) {
             DailyTrainSeat dailyTrainSeat = finalSelectedSeatList.get(i);
             // 修改座位表售卖情况sell
@@ -85,6 +90,12 @@ public class AfterConfirmOrderService {
             CommonResp commonResp = memberFeign.save(memberTicketSaveReq);
             log.info("调用Member接口保存订单信息，返回：{}", commonResp);
             // 更新确认订单为成功
+
+            ConfirmOrder updateConfirmOrder = new ConfirmOrder();
+            updateConfirmOrder.setId(confirmOrder.getId());
+            updateConfirmOrder.setStatus(ConfirmOrderStatusEnum.SUCCESS.getCode());
+            updateConfirmOrder.setUpdateTime(new Date());
+            confirmOrderMapper.updateByPrimaryKeySelective(updateConfirmOrder);
         }
 
 

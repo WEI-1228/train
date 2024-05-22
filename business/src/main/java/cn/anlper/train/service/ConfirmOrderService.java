@@ -119,7 +119,7 @@ public class ConfirmOrderService {
         }
 
         // 选中的座位做事务处理：
-        afterConfirmOrderService.afterDoConfirm(finalSelectedSeatList, dailyTrainTicket, tickets);
+        afterConfirmOrderService.afterDoConfirm(finalSelectedSeatList, dailyTrainTicket, tickets, confirmOrder);
 
             // 修改座位表售卖情况sell
 
