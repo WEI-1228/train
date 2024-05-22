@@ -14,10 +14,10 @@ public class TrainQueryReq extends PageReq {
     private String type;
     private String start;
     private String startPinyin;
-    @JsonFormat(pattern = "hh:MM:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
     private String end;
     private String endPinyin;
-    @JsonFormat(pattern = "hh:MM:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 }
