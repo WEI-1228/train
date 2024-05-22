@@ -310,7 +310,7 @@ export default defineComponent({
 
       axios.post("/business/confirm-order/do", {
         dailyTrainTicketId: dailyTrainTicket.id,
-        date: dailyTrainTicket.date,
+        date: dailyTrainTicket.dailyDate,
         trainCode: dailyTrainTicket.trainCode,
         start: dailyTrainTicket.start,
         end: dailyTrainTicket.end,
