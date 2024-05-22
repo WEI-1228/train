@@ -84,12 +84,14 @@ public class ConfirmOrderService {
             }
             log.info("本次选票的相对序号为：{}", offsetList);
             // 选座
-            getSeat(date, trainCode, seatTypeCode, ticketReq0.getSeat().substring(0, 1), offsetList);
+            getSeat(date, trainCode, seatTypeCode, ticketReq0.getSeat().substring(0, 1), offsetList,
+                    dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
         } else {
             log.info("本次购票没有选座");
             // 选座
             for (ConfirmOrderTicketReq ticket: tickets) {
-                getSeat(date, trainCode, ticket.getSeatTypeCode(), null, null);
+                getSeat(date, trainCode, ticket.getSeatTypeCode(), null, null,
+                        dailyTrainTicket.getStartIndex(), dailyTrainTicket.getEndIndex());
             }
         }
 
@@ -115,7 +117,8 @@ public class ConfirmOrderService {
      * @param column
      * @param offsetList
      */
-    private void getSeat(Date date, String trainCode, String seatType, String column, List<Integer> offsetList) {
+    private void getSeat(Date date, String trainCode, String seatType, String column,
+                         List<Integer> offsetList, int startIndex, int endIndex) {
         List<DailyTrainCarriage> dailyTrainCarriageList = dailyTrainCarriageService.selectBySeatType(date, trainCode, seatType);
         log.info("共查出{}个符合条件的车厢", dailyTrainCarriageList.size());
         for (DailyTrainCarriage dailyTrainCarriage: dailyTrainCarriageList) {
@@ -123,10 +126,36 @@ public class ConfirmOrderService {
             log.info("开始从车厢{}选座", dailyTrainCarriage.getIndexes());
             List<DailyTrainSeat> dailyTrainSeats = dailyTrainSeatService.selectByCarriage(date, trainCode, dailyTrainCarriage.getIndexes());
             log.info("{}号车厢的座位数：{}", dailyTrainCarriage.getIndexes(), dailyTrainSeats.size());
+            for (DailyTrainSeat dailyTrainSeat : dailyTrainSeats) {
+                boolean isChoose = calSell(dailyTrainSeat, startIndex, endIndex);
+                if (isChoose) {
+                    log.info("选票成功，座位号是：{}", dailyTrainSeat.getCarriageSeatIndex());
+                    break;
+                }
+            }
         }
     }
 
-    private static void reduceTickets(ConfirmOrderDoReq req, DailyTrainTicket dailyTrainTicket) {
+    // 1 2 3 4 5 6
+    //  0 0 0 0 0
+    private boolean calSell(DailyTrainSeat dailyTrainSeat, int startIndex, int endIndex) {
+        String sell = dailyTrainSeat.getSell();
+        String sellPart = sell.substring(startIndex - 1, endIndex - 1);
+        if (Integer.parseInt(sellPart) > 0) {
+            log.info("{}号座位在本站区间{}~{}已售过票，不可选中", dailyTrainSeat.getCarriageSeatIndex(), startIndex, endIndex);
+            return false;
+        } else {
+            log.info("{}号座位在本站区间{}~{}未售过票，可选中该座位", dailyTrainSeat.getCarriageSeatIndex(), startIndex, endIndex);
+            char[] charArray = sell.toCharArray();
+            for (int i = startIndex; i < endIndex; i++)
+                charArray[i - 1] = '1';
+            String newSell = new String(charArray);
+            log.info("完成选座，{}号座位的售卖情况发生变化：{} -> {}", dailyTrainSeat.getCarriageSeatIndex(), sell, newSell);
+            return true;
+        }
+    }
+
+    private void reduceTickets(ConfirmOrderDoReq req, DailyTrainTicket dailyTrainTicket) {
         for (ConfirmOrderTicketReq ticket : req.getTickets()) {
             String seatTypeCode = ticket.getSeatTypeCode();
             SeatTypeEnum seatTypeEnum = EnumUtil.getBy(SeatTypeEnum::getCode, seatTypeCode);
