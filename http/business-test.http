@@ -32,7 +32,7 @@ Accept: application/json
 
 ###
 
-GET http://localhost:8000/business/daily-train-ticket/query-list?
+GET http://localhost:8000/business/daily-train-ticket/query-list3?
     page=1&size=10&dailyDate=2024-05-31
 Accept: application/json
 token: {{token}}

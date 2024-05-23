@@ -20,6 +20,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,12 +105,18 @@ public class DailyTrainTicketService {
         log.info("生成日期【{}】，车次【{}】的余票信息结束", DateUtil.formatDate(date), trainCode);
     }
 
-//    @CachePut("DailyTrainTicketService")
-//    public PageResp queryList2(DailyTrainTicketQueryReq req) {
-//        return queryList(req);
-//    }
+    @Cacheable("DailyTrainTicketService.queryList3")
+    public PageResp queryList3(DailyTrainTicketQueryReq req) {
+        log.info("测试缓存击穿");
+        return null;
+    }
 
-    @Cacheable("DailyTrainTicketService")
+    @CachePut("DailyTrainTicketService.queryList")
+    public PageResp queryList2(DailyTrainTicketQueryReq req) {
+        return queryList(req);
+    }
+
+    @Cacheable("DailyTrainTicketService.queryList")
     public PageResp queryList(DailyTrainTicketQueryReq req) {
         Example example = new Example(DailyTrainTicket.class);
         Example.Criteria criteria = example.createCriteria();
