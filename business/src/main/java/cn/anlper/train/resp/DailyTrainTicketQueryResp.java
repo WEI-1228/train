@@ -6,12 +6,13 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
 @ToString
-public class DailyTrainTicketQueryResp {
+public class DailyTrainTicketQueryResp implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
