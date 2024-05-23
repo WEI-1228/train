@@ -15,6 +15,7 @@ import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class TrainService {
 
     }
 
+    @Transactional
     public PageResp queryList(TrainQueryReq req) {
         Example example = new Example(Train.class);
         PageHelper.startPage(req.getPage(), req.getSize());
@@ -58,8 +60,11 @@ public class TrainService {
         return pageResp;
     }
 
+    @Transactional
     public List<TrainQueryResp> queryAll() {
         List<Train> trainList = selectAll();
+        log.info("第二次查询");
+        selectAll();
         return BeanUtil.copyToList(trainList, TrainQueryResp.class);
     }
 
