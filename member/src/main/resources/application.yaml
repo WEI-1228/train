@@ -28,3 +28,11 @@ mybatis:
 logging:
   level:
     cn.anlper.train.mapper: trace
+
+seata:
+  tx-service-group: train-group # 事务组名称
+  service:
+    vgroup-mapping:
+      train-group: default # 事务组和seata集群关联
+    grouplist:
+      default: localhost:8091 # seata集群对应的机器
