@@ -60,11 +60,11 @@ public class TrainService {
         return pageResp;
     }
 
-//    @Transactional
+    @Transactional
     public List<TrainQueryResp> queryAll() {
         List<Train> trainList = selectAll();
-        log.info("第二次查询");
-        selectAll();
+//        log.info("第二次查询");
+//        selectAll();
         return BeanUtil.copyToList(trainList, TrainQueryResp.class);
     }
 

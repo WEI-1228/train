@@ -4,7 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -12,7 +11,7 @@ import java.util.Date;
  * 表注释：车次
 */
 @Table(name = "train")
-public class Train implements Serializable {
+public class Train {
     /**
      * id
      */
