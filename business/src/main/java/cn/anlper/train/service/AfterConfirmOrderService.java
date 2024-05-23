@@ -13,10 +13,11 @@ import cn.anlper.train.req.ConfirmOrderTicketReq;
 import cn.anlper.train.req.MemberTicketSaveReq;
 import cn.anlper.train.resp.CommonResp;
 import cn.anlper.train.utils.SnowFlake;
+import io.seata.core.context.RootContext;
+import io.seata.spring.annotation.GlobalTransactional;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -37,9 +38,10 @@ public class AfterConfirmOrderService {
     @Resource
     private SnowFlake snowFlake;
 
-    @Transactional
+    @GlobalTransactional
     public void afterDoConfirm(List<DailyTrainSeat> finalSelectedSeatList, DailyTrainTicket dailyTrainTicket,
                                List<ConfirmOrderTicketReq> tickets, ConfirmOrder confirmOrder) {
+        log.info("seata全局事务ID：{}", RootContext.getXID());
         for (int i = 0; i < finalSelectedSeatList.size(); i++) {
             DailyTrainSeat dailyTrainSeat = finalSelectedSeatList.get(i);
             // 修改座位表售卖情况sell
@@ -87,6 +89,10 @@ public class AfterConfirmOrderService {
             memberTicketSaveReq.setEndTime(dailyTrainTicket.getEndTime());
             memberTicketSaveReq.setSeatType(dailyTrainSeat.getSeatType());
 
+            // 这里调用的使用远程调用保存乘客车票信息，因此事务对远程订单的保存不生效。
+            // 如果车票保存成功了，但是后续的订单状态修改失败了，这整个方法里所做的数据库操作都会回滚
+            // 但是远程调用的方法操作的数据库并不会回滚，就有问题了
+            // 所以这里需要使用分布式事务来保证一致性
             CommonResp commonResp = memberFeign.save(memberTicketSaveReq);
             log.info("调用Member接口保存订单信息，返回：{}", commonResp);
             // 更新确认订单为成功

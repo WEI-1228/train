@@ -1,6 +1,8 @@
 package cn.anlper.train.exception;
 
 import cn.anlper.train.resp.CommonResp;
+import cn.hutool.core.util.StrUtil;
+import io.seata.core.context.RootContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,7 +19,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public CommonResp exceptionHandler(Exception e) {
+    public CommonResp exceptionHandler(Exception e) throws Exception {
+        log.info("seata全局事务ID：{}", RootContext.getXID());
+        if (StrUtil.isNotBlank(RootContext.getXID())) {
+            throw e;
+        }
         log.error("系统异常：", e);
         return CommonResp.fail("系统出现异常，请联系管理员");
     }
