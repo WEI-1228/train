@@ -6,7 +6,8 @@ server:
 spring:
   application:
     name: train-batch-service
-
+  profiles:
+    active: dev
 
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
