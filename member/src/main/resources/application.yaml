@@ -6,14 +6,17 @@ server:
 spring:
   application:
     name: train-member-service
-
-
+  profiles:
+    active: dev
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://121.196.247.67/train_member?characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
     username: train
     password: 258079
+
+config:
+  info: hello nacos
 
 # ========================mybatis===================
 mybatis:

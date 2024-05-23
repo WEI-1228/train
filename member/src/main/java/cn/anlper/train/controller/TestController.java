@@ -3,6 +3,7 @@ package cn.anlper.train.controller;
 import cn.anlper.train.resp.CommonResp;
 import cn.anlper.train.service.MemberService;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,5 +24,13 @@ public class TestController {
     public CommonResp count() {
         int count = memberService.count();
         return CommonResp.ok(count);
+    }
+
+    @Value("${config.info}")
+    private String configValue;
+
+    @GetMapping("/nacos-test")
+    public String nct() {
+        return configValue;
     }
 }
