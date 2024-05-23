@@ -13,7 +13,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 @MapperScan("cn.anlper.train.mapper")
 @Slf4j
 @EnableFeignClients
-@EnableCaching
+//@EnableCaching
 public class BusinessApplication8002 {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(BusinessApplication8002.class);
