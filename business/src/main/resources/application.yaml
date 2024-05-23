@@ -17,6 +17,11 @@ spring:
   jackson:
     date-format: "yyyy-MM-dd HH:mm:ss"
     time-zone: "GMT+8"
+  data:
+    redis:
+      host: 121.196.247.67
+      port: 6379
+      password: 258079
 
 # ========================mybatis===================
 mybatis:
