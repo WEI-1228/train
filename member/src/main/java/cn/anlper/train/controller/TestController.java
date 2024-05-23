@@ -29,8 +29,11 @@ public class TestController {
     @Value("${config.info}")
     private String configValue;
 
+    @Value("${server.port}")
+    private String port;
+
     @GetMapping("/nacos-test")
     public String nct() {
-        return configValue;
+        return configValue + "Port: " + port;
     }
 }
