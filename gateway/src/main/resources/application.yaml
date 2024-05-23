@@ -1,6 +1,11 @@
 server:
   port: 8000
+
 spring:
+  application:
+    name: train-gateway-service
+  profiles:
+    active: dev
   cloud:
     gateway:
       routes:
