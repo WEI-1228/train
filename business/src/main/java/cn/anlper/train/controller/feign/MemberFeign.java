@@ -8,11 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "train-member-service", url = "http://localhost:8001/member/feign/ticket/")
+@FeignClient("train-member-service")
+//@FeignClient(name = "train-member-service", url = "http://localhost:8001/member/feign/ticket/")
 public interface MemberFeign {
-    @PostMapping("/save")
+    @PostMapping("/member/feign/ticket/save")
     CommonResp save(@RequestBody @Validated MemberTicketSaveReq req);
 
-    @GetMapping("/query-list")
+    @GetMapping("/member/feign/ticket/query-list")
     CommonResp queryList(@Validated MemberTicketSaveReq req);
 }

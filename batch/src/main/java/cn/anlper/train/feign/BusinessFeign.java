@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Date;
 
-//@FeignClient("train-business-service")
-@FeignClient(name = "train-business-service", url = "http://localhost:8002/business")
+@FeignClient("train-business-service")
+//@FeignClient(name = "train-business-service", url = "http://localhost:8002/business")
 public interface BusinessFeign {
 
-    @GetMapping("/business/hello")
+    @GetMapping("/business/business/hello")
     String hello();
 
-    @GetMapping("/admin/daily-train/gen-daily/{date}")
+    @GetMapping("/business/admin/daily-train/gen-daily/{date}")
     CommonResp genDaily(@PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date);
 }
