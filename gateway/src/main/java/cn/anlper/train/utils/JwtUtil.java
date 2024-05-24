@@ -31,10 +31,15 @@ public class JwtUtil {
     }
 
     public static boolean validate(String token) {
-        JWT jwt = JWTUtil.parseToken(token).setKey(key.getBytes());
-        boolean validate = jwt.validate(0);
-        log.info("JWT token校验结果：{}", validate);
-        return validate;
+        try {
+            // 传入的JWT如果不是JWT的格式，就会报错
+            JWT jwt = JWTUtil.parseToken(token).setKey(key.getBytes());
+            boolean validate = jwt.validate(0);
+            log.info("JWT token校验结果：{}", validate);
+            return validate;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public static JSONObject getJSONObject(String token) {

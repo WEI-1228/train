@@ -39,7 +39,6 @@ public class LoginMemberFilter implements GlobalFilter, Ordered {
             return exchange.getResponse().setComplete();
         }
 
-        JwtUtil.getJSONObject(token);
         boolean validate = JwtUtil.validate(token);
         if (validate) {
             log.info("token有效，放行该请求");

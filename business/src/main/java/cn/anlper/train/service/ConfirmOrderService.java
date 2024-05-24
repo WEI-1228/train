@@ -157,7 +157,7 @@ public class ConfirmOrderService {
                 throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
             }
         } finally {
-            log.error("购票流程结束，释放锁");
+            log.info("购票流程结束，释放锁");
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
