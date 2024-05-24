@@ -26,6 +26,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -52,15 +54,23 @@ public class ConfirmOrderService {
     private AfterConfirmOrderService afterConfirmOrderService;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Resource
     private SnowFlake snowFlake;
     public void doConfirm(ConfirmOrderDoReq req) {
         String lockKey = req.getDate() + "-" + req.getTrainCode();
-        Boolean setIfAbsent = redisTemplate.opsForValue().setIfAbsent(lockKey, lockKey, 5, TimeUnit.SECONDS);
-        while (Boolean.FALSE.equals(setIfAbsent)) {
-            setIfAbsent = redisTemplate.opsForValue().setIfAbsent(lockKey, lockKey, 5, TimeUnit.SECONDS);
+        RLock lock;
+        try {
+            lock = redissonClient.getLock(lockKey);
+            boolean tryLock = lock.tryLock(5, TimeUnit.SECONDS); // 自带看门狗，默认锁30秒，会自动加时
+            if (!tryLock) throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
+        } catch (Exception e) {
+            log.error("获取锁出现问题：", e);
+            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_EXCEPTION);
         }
+
         try {
             // 业务校验，比如车次是否存在，车次是否在有效期等，这里省略
             List<ConfirmOrderTicketReq> tickets = req.getTickets();
@@ -148,7 +158,9 @@ public class ConfirmOrderService {
             }
         } finally {
             log.error("购票流程结束，释放锁");
-            redisTemplate.delete(lockKey);
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
 
     }

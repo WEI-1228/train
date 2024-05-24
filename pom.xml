@@ -51,6 +51,7 @@
         <feign-micrometer.version>12.5</feign-micrometer.version>
         <zipkin-reporter-brave.version>2.17.0</zipkin-reporter-brave.version>
         <pagehelper.version>1.4.6</pagehelper.version>
+        <redisson.version>3.30.0</redisson.version>
     </properties>
 
     <dependencyManagement>
@@ -194,6 +195,12 @@
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.redisson/redisson-spring-boot-starter -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
             </dependency>
 
         </dependencies>
