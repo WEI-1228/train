@@ -12,7 +12,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import io.seata.core.context.RootContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ public class TicketService {
     @Resource
     private SnowFlake snowFlake;
     public void save(MemberTicketSaveReq req) {
-        log.info("seata全局事务ID save：{}", RootContext.getXID());
+//        log.info("seata全局事务ID save：{}", RootContext.getXID());
         DateTime now = DateTime.now();
         Ticket ticket = BeanUtil.copyProperties(req, Ticket.class);
         ticket.setId(snowFlake.nextId());

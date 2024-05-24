@@ -13,8 +13,6 @@ import cn.anlper.train.req.ConfirmOrderTicketReq;
 import cn.anlper.train.req.MemberTicketSaveReq;
 import cn.anlper.train.resp.CommonResp;
 import cn.anlper.train.utils.SnowFlake;
-import io.seata.core.context.RootContext;
-import io.seata.spring.annotation.GlobalTransactional;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,10 +36,10 @@ public class AfterConfirmOrderService {
     @Resource
     private SnowFlake snowFlake;
 
-    @GlobalTransactional
+//    @GlobalTransactional
     public void afterDoConfirm(List<DailyTrainSeat> finalSelectedSeatList, DailyTrainTicket dailyTrainTicket,
                                List<ConfirmOrderTicketReq> tickets, ConfirmOrder confirmOrder) {
-        log.info("seata全局事务ID：{}", RootContext.getXID());
+//        log.info("seata全局事务ID：{}", RootContext.getXID());
         for (int i = 0; i < finalSelectedSeatList.size(); i++) {
             DailyTrainSeat dailyTrainSeat = finalSelectedSeatList.get(i);
             // 修改座位表售卖情况sell
