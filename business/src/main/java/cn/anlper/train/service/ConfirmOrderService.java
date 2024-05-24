@@ -22,6 +22,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -61,7 +62,7 @@ public class ConfirmOrderService {
     @Resource
     private SnowFlake snowFlake;
 
-    @SentinelResource("doConfirm")
+    @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void doConfirm(ConfirmOrderDoReq req) {
         String lockKey = req.getDate() + "-" + req.getTrainCode();
         RLock lock;
@@ -335,6 +336,11 @@ public class ConfirmOrderService {
         List<ConfirmOrderQueryResp> confirmOrderQueryResps = BeanUtil.copyToList(confirmOrders, ConfirmOrderQueryResp.class);
         PageInfo<ConfirmOrder> pageInfo = new PageInfo<>(confirmOrders);
         return new PageResp<>(confirmOrderQueryResps, pageInfo.getTotal());
+    }
+
+    public void doConfirmBlock(ConfirmOrderDoReq req, BlockException e) {
+        log.info("购票请求被限流：{}", req);
+        throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_FLOW_EXCEPTION);
     }
 
 }
