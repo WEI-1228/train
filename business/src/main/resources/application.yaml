@@ -32,6 +32,16 @@ spring:
     sentinel:
       transport:
         dashboard: localhost:8080
+      datasource:
+        flow:
+          nacos:
+            serverAddr: localhost:8848
+            namespace: train
+            groupId: DEFAULT_GROUP
+            dataId: sentinel-business-flow
+            ruleType: flow
+
+
 
 # ========================mybatis===================
 mybatis:
