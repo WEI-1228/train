@@ -19,9 +19,8 @@ spring:
     time-zone: "GMT+8"
   data:
     redis:
-      host: 121.196.247.67
+      host: localhost
       port: 6379
-      password: 258079
   cache:
     type: redis
     redis:

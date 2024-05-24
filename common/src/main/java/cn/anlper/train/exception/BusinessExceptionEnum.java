@@ -12,7 +12,9 @@ public enum BusinessExceptionEnum {
 
     BUSINESS_STATION_NAME_UNIQUE_ERROR("车站已存在"),
 
-    CONFIRM_ORDER_TICKET_COUNT_ERROR("余票不足");
+    CONFIRM_ORDER_TICKET_COUNT_ERROR("余票不足"),
+    CONFIRM_ORDER_EXCEPTION("服务器忙，请稍后重试"),
+    CONFIRM_ORDER_LOCK_FAIL("抢票人数多，请稍后重试");
     private final String desc;
 
 }
