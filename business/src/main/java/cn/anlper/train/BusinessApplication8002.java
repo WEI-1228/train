@@ -26,8 +26,8 @@ public class BusinessApplication8002 {
         ConfigurableEnvironment environment = context.getEnvironment();
         log.info("启动成功，访问地址：\thttp://127.0.0.1:{}", environment.getProperty("server.port"));
         // 限流规则
-        initFlowRules();
-        log.info("已定义限流规则");
+//        initFlowRules();
+//        log.info("已定义限流规则");
     }
 
     private static void initFlowRules() {
