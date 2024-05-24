@@ -50,7 +50,7 @@ public class ConfirmOrderService {
 
     @Resource
     private SnowFlake snowFlake;
-    public void doConfirm(ConfirmOrderDoReq req) {
+    synchronized public void doConfirm(ConfirmOrderDoReq req) {
         // 业务校验，比如车次是否存在，车次是否在有效期等，这里省略
 
         List<ConfirmOrderTicketReq> tickets = req.getTickets();
