@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Date;
 
-@FeignClient("train-business-service")
+@FeignClient(value = "train-business-service", fallback = BusinessFeignFallback.class)
 //@FeignClient(name = "train-business-service", url = "http://localhost:8002/business")
 public interface BusinessFeign {
 

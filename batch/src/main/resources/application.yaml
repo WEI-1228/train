@@ -8,6 +8,20 @@ spring:
     name: train-batch-service
   profiles:
     active: dev
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+      datasource:
+        degrade:
+          nacos:
+            serverAddr: localhost:8848
+            namespace: train
+            groupId: DEFAULT_GROUP
+            dataId: sentinel-batch-degrade
+            ruleType: degrade
+    openfeign:
+      lazy-attributes-resolution: true
 
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
@@ -29,3 +43,6 @@ mybatis:
 logging:
   level:
     cn.anlper.train.mapper: trace
+feign:
+  sentinel:
+    enabled: true
