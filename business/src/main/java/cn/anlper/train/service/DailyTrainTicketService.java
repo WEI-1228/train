@@ -116,7 +116,7 @@ public class DailyTrainTicketService {
         return queryList(req);
     }
 
-    @Cacheable("DailyTrainTicketService.queryList")
+//    @Cacheable("DailyTrainTicketService.queryList")
     public PageResp queryList(DailyTrainTicketQueryReq req) {
         Example example = new Example(DailyTrainTicket.class);
         Example.Criteria criteria = example.createCriteria();
