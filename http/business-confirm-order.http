@@ -1,0 +1,23 @@
+POST http://localhost:8000/business/confirm-order/do
+Content-Type: application/json
+token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3MTY1MjU0ODAsIm1vYmlsZSI6IjEzMDAwMDAwMDAwIiwiaWQiOjQ0NTU4MjE1OTk5MDg4NjQwMCwiZXhwIjoxNzE2NjExODgwLCJpYXQiOjE3MTY1MjU0ODB9.S_ZufKpz2BiMRjuQ_3A_K_h508hxvZq3h8qb8KfbyFQ
+
+{
+  "dailyTrainTicketId": 449073845157105664,
+  "date": 1717084800000,
+  "end": "南京",
+  "start": "广州",
+  "tickets": [
+    {
+      "passengerId": 448113032984399900,
+      "passengerIdCard": "124234",
+      "passengerName": "小军",
+      "passengerType": "3",
+      "seat": "A1",
+      "seatTypeCode": "2"
+    }
+  ],
+  "trainCode": "G1"
+}
+
+###
