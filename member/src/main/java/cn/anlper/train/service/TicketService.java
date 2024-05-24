@@ -42,6 +42,7 @@ public class TicketService {
 
     public PageResp queryList(TicketQueryReq req) {
         Example example = new Example(Ticket.class);
+        example.setOrderByClause("update_time desc");
         Long id = LoginMemberContext.getId();
         example.createCriteria().andEqualTo("memberId", id);
         PageHelper.startPage(req.getPage(), req.getSize());
