@@ -39,6 +39,8 @@ public class DailyTrainService {
     private DailyTrainSeatService dailyTrainSeatService;
     @Resource
     private DailyTrainTicketService dailyTrainTicketService;
+    @Resource
+    private SkTokenService skTokenService;
 
     @Resource
     private SnowFlake snowFlake;
@@ -92,10 +94,12 @@ public class DailyTrainService {
 
         for (Train train: trainList) {
             genDailyTrain(date, train);
-            dailyTrainStationService.genDailyTrainStation(date, train.getCode());
-            dailyTrainCarriageService.genDailyTrainCarriage(date, train.getCode());
-            dailyTrainSeatService.genDailyTrainSeat(date, train.getCode());
-            dailyTrainTicketService.genDailyTickets(train, date, train.getCode());
+            String code = train.getCode();
+            dailyTrainStationService.genDailyTrainStation(date, code);
+            dailyTrainCarriageService.genDailyTrainCarriage(date, code);
+            dailyTrainSeatService.genDailyTrainSeat(date, code);
+            dailyTrainTicketService.genDailyTickets(train, date, code);
+            skTokenService.genDailyToken(date, code);
         }
     }
 
