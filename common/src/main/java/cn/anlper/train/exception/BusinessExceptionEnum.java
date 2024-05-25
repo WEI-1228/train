@@ -17,7 +17,8 @@ public enum BusinessExceptionEnum {
     CONFIRM_ORDER_LOCK_FAIL("抢票人数多，请稍后重试"),
     CONFIRM_ORDER_FLOW_EXCEPTION("当前抢票人数多，请稍后重试"),
 
-    CONFIRM_ORDER_TOKEN_FAIL("余票不足，请稍后再来");
+    CONFIRM_ORDER_TOKEN_FAIL("余票不足，请稍后再来"),
+    CONFIRM_ORDER_USER_VISIT_ERROR("操作频率太快，请稍后再试");
     private final String desc;
 
 }

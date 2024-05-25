@@ -1,7 +1,10 @@
 package cn.anlper.train.service;
 
 import cn.anlper.train.context.LoginMemberContext;
-import cn.anlper.train.entities.*;
+import cn.anlper.train.entities.ConfirmOrder;
+import cn.anlper.train.entities.DailyTrainCarriage;
+import cn.anlper.train.entities.DailyTrainSeat;
+import cn.anlper.train.entities.DailyTrainTicket;
 import cn.anlper.train.enums.ConfirmOrderStatusEnum;
 import cn.anlper.train.enums.RedisTokenEnum;
 import cn.anlper.train.enums.SeatTypeEnum;
@@ -65,6 +68,17 @@ public class ConfirmOrderService {
 
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void doConfirm(ConfirmOrderDoReq req) {
+        // 身份验证，一个用户三秒内只能发送一次抢票请求
+        Long id = LoginMemberContext.getId();
+        String userToken = RedisTokenEnum.LOCK_BUY_TICKET.getPrefix() + id;
+        String exist = redisTemplate.opsForValue().get(userToken);
+        if (StrUtil.isNotBlank(exist)) {
+            log.info("用户ID【{}】访问频率过快，限制访问", id);
+            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_USER_VISIT_ERROR);
+        }
+        log.info("设置用户令牌：【{}】", userToken);
+        redisTemplate.opsForValue().set(userToken, userToken, 3, TimeUnit.SECONDS);
+
         // 查询令牌数量
         String trainCode = req.getTrainCode();
         Date date = req.getDate();
@@ -100,7 +114,7 @@ public class ConfirmOrderService {
             Date now = new Date();
             ConfirmOrder confirmOrder = new ConfirmOrder();
             confirmOrder.setId(snowFlake.nextId());
-            confirmOrder.setMemberId(LoginMemberContext.getId());
+            confirmOrder.setMemberId(id);
             confirmOrder.setDate(date);
             confirmOrder.setTrainCode(trainCode);
             confirmOrder.setStart(start);
