@@ -1,11 +1,9 @@
 package cn.anlper.train.service;
 
 import cn.anlper.train.context.LoginMemberContext;
-import cn.anlper.train.entities.ConfirmOrder;
-import cn.anlper.train.entities.DailyTrainCarriage;
-import cn.anlper.train.entities.DailyTrainSeat;
-import cn.anlper.train.entities.DailyTrainTicket;
+import cn.anlper.train.entities.*;
 import cn.anlper.train.enums.ConfirmOrderStatusEnum;
+import cn.anlper.train.enums.RedisTokenEnum;
 import cn.anlper.train.enums.SeatTypeEnum;
 import cn.anlper.train.exception.BusinessException;
 import cn.anlper.train.exception.BusinessExceptionEnum;
@@ -19,6 +17,7 @@ import cn.anlper.train.utils.SnowFlake;
 import cn.anlper.train.utils.TrainUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
@@ -54,6 +53,8 @@ public class ConfirmOrderService {
     private DailyTrainSeatService dailyTrainSeatService;
     @Resource
     private AfterConfirmOrderService afterConfirmOrderService;
+    @Resource
+    private SkTokenService skTokenService;
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
@@ -64,22 +65,34 @@ public class ConfirmOrderService {
 
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void doConfirm(ConfirmOrderDoReq req) {
-        String lockKey = req.getDate() + "-" + req.getTrainCode();
+        // 查询令牌数量
+        String trainCode = req.getTrainCode();
+        Date date = req.getDate();
+        int tokenNum = getTokenNum(trainCode, date);
+        // 如果没有令牌了，直接返回没票了
+        if (tokenNum <= 0) {
+            log.info("没有令牌了，直接抢票失败");
+            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
+        }
+        log.info("获取令牌成功，扣减令牌，开始抢票");
+        decreaseTokenNum(trainCode, date);
+
+        String lockKey = RedisTokenEnum.LOCK_BUY_TICKET.getPrefix() + req.getDate() + "-" + trainCode;
         RLock lock;
         try {
             lock = redissonClient.getLock(lockKey);
             boolean tryLock = lock.tryLock(5, TimeUnit.SECONDS); // 自带看门狗，默认锁30秒，会自动加时
             if (!tryLock) throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
         } catch (Exception e) {
-            log.error("获取锁出现问题：", e);
+            log.error("获取锁出现问题，抢票失败，将令牌放回：", e);
+            increaseTokenNum(trainCode, date);
             throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_EXCEPTION);
         }
 
         try {
             // 业务校验，比如车次是否存在，车次是否在有效期等，这里省略
             List<ConfirmOrderTicketReq> tickets = req.getTickets();
-            Date date = req.getDate();
-            String trainCode = req.getTrainCode();
+
             String start = req.getStart();
             String end = req.getEnd();
 
@@ -103,7 +116,12 @@ public class ConfirmOrderService {
             DailyTrainTicket dailyTrainTicket = dailyTrainTicketService.selectByUnique(date, trainCode, start, end);
             log.info("查出余票记录：{}", JSON.toJSONString(dailyTrainTicket));
             // 扣减余票数量
-            reduceTickets(req, dailyTrainTicket);
+            boolean reduceTickets = reduceTickets(req, dailyTrainTicket);
+            if (!reduceTickets) {
+                increaseTokenNum(trainCode, date);
+                log.info("余票不足，将令牌放回");
+                throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_TICKET_COUNT_ERROR);
+            }
             Integer startIndex = dailyTrainTicket.getStartIndex();
             Integer endIndex = dailyTrainTicket.getEndIndex();
 
@@ -157,7 +175,8 @@ public class ConfirmOrderService {
             try {
                 afterConfirmOrderService.afterDoConfirm(finalSelectedSeatList, dailyTrainTicket, tickets, confirmOrder);
             } catch (Exception e) {
-                log.error("保存购票信息失败", e);
+                increaseTokenNum(trainCode, date);
+                log.error("保存购票信息失败，将令牌放回", e);
                 throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_LOCK_FAIL);
             }
         } finally {
@@ -167,6 +186,47 @@ public class ConfirmOrderService {
             }
         }
 
+    }
+
+    private void increaseTokenNum(String trainCode, Date date) {
+        String tokenKey = RedisTokenEnum.QUERY_TOKEN_NUM.getPrefix() + date + '-' + trainCode;
+        redisTemplate.opsForValue().increment(tokenKey);
+    }
+
+    private void decreaseTokenNum(String trainCode, Date date) {
+        String tokenKey = RedisTokenEnum.QUERY_TOKEN_NUM.getPrefix() + date + '-' + trainCode;
+        redisTemplate.opsForValue().decrement(tokenKey);
+    }
+
+    private int getTokenNum(String trainCode, Date date) {
+        String tokenKey = RedisTokenEnum.QUERY_TOKEN_NUM.getPrefix() + date + '-' + trainCode;
+        // 查看缓存中是否有token的余量
+        // 没有的话就进数据库去查
+        log.info("开始尝试获取令牌 [{}]", tokenKey);
+        if (StrUtil.isBlank(redisTemplate.opsForValue().get(tokenKey))) {
+            String tokenLock = RedisTokenEnum.LOCK_QUERY_TOKEN.getPrefix() + date + '-' + trainCode;
+            RLock lock = redissonClient.getLock(tokenLock);
+            try {
+                log.info("没有令牌缓存，尝试回数据库查询令牌数量");
+                boolean tryLock = lock.tryLock(5, TimeUnit.SECONDS);
+                if (!tryLock) {
+                    log.info("争夺令牌查询锁失败，令牌验证失败");
+                    return 0;
+                }
+                if (StrUtil.isBlank(redisTemplate.opsForValue().get(tokenKey))) {
+                    int tokenCount = skTokenService.selectCount(date, trainCode);
+                    log.info("日期【{}】 车次【{}】的令牌余量为：{}", DateUtil.formatDate(date), trainCode, tokenCount);
+                    redisTemplate.opsForValue().set(tokenKey, String.valueOf(tokenCount));
+                }
+                if (lock.isHeldByCurrentThread()) {
+                    log.info("令牌查询结束，释放令牌查询锁");
+                    lock.unlock();
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Integer.parseInt(redisTemplate.opsForValue().get(tokenKey));
     }
 
     /**
@@ -291,7 +351,7 @@ public class ConfirmOrderService {
         }
     }
 
-    private void reduceTickets(ConfirmOrderDoReq req, DailyTrainTicket dailyTrainTicket) {
+    private boolean reduceTickets(ConfirmOrderDoReq req, DailyTrainTicket dailyTrainTicket) {
         for (ConfirmOrderTicketReq ticket : req.getTickets()) {
             String seatTypeCode = ticket.getSeatTypeCode();
             SeatTypeEnum seatTypeEnum = EnumUtil.getBy(SeatTypeEnum::getCode, seatTypeCode);
@@ -299,33 +359,34 @@ public class ConfirmOrderService {
                 case YDZ -> {
                     int countLeft = dailyTrainTicket.getYdz() - 1;
                     if (countLeft < 0) {
-                        throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_TICKET_COUNT_ERROR);
+                        return false;
                     }
                     dailyTrainTicket.setYdz(countLeft);
                 }
                 case EDZ -> {
                     int countLeft = dailyTrainTicket.getEdz() - 1;
                     if (countLeft < 0) {
-                        throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_TICKET_COUNT_ERROR);
+                        return false;
                     }
                     dailyTrainTicket.setEdz(countLeft);
                 }
                 case YW -> {
                     int countLeft = dailyTrainTicket.getYw() - 1;
                     if (countLeft < 0) {
-                        throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_TICKET_COUNT_ERROR);
+                        return false;
                     }
                     dailyTrainTicket.setYw(countLeft);
                 }
                 case RW -> {
                     int countLeft = dailyTrainTicket.getRw() - 1;
                     if (countLeft < 0) {
-                        throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_TICKET_COUNT_ERROR);
+                        return false;
                     }
                     dailyTrainTicket.setRw(countLeft);
                 }
             }
         }
+        return true;
     }
 
     public PageResp queryList(ConfirmOrderQueryReq req) {

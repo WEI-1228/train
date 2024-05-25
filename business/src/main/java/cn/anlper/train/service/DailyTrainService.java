@@ -2,6 +2,7 @@ package cn.anlper.train.service;
 
 import cn.anlper.train.entities.DailyTrain;
 import cn.anlper.train.entities.Train;
+import cn.anlper.train.enums.RedisTokenEnum;
 import cn.anlper.train.mapper.DailyTrainMapper;
 import cn.anlper.train.req.DailyTrainQueryReq;
 import cn.anlper.train.req.DailyTrainSaveReq;
@@ -17,6 +18,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
@@ -41,6 +44,8 @@ public class DailyTrainService {
     private DailyTrainTicketService dailyTrainTicketService;
     @Resource
     private SkTokenService skTokenService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Resource
     private SnowFlake snowFlake;
@@ -111,6 +116,8 @@ public class DailyTrainService {
                 .andEqualTo("dailyDate", date)
                 .andEqualTo("code", train.getCode());
         dailyTrainMapper.deleteByExample(example);
+        redisTemplate.delete(RedisTokenEnum.QUERY_TOKEN_NUM.getPrefix() + date + '-' + train.getCode());
+
 
         // 生成该车次数据
         DateTime now = DateTime.now();

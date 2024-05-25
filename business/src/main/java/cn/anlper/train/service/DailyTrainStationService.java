@@ -106,7 +106,7 @@ public class DailyTrainStationService {
     }
 
     public int countByTrainCode(Date date, String trainCode) {
-        Example example = new Example(TrainStation.class);
+        Example example = new Example(DailyTrainStation.class);
         example.createCriteria()
                 .andEqualTo("dailyDate", date)
                 .andEqualTo("trainCode", trainCode);

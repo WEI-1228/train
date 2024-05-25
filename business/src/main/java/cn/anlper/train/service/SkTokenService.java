@@ -92,4 +92,11 @@ public class SkTokenService {
         log.info("车次【{}】初始生成的令牌书为：{}", trainCode, count);
         skTokenMapper.insert(skToken);
     }
+
+    public int selectCount(Date date, String trainCode) {
+        Example example = new Example(SkToken.class);
+        example.createCriteria().andEqualTo("date", date).andEqualTo("trainCode", trainCode);
+        SkToken skTokens = skTokenMapper.selectOneByExample(example);
+        return skTokens.getCount();
+    }
 }
