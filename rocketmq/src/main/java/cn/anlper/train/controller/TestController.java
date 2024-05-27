@@ -1,6 +1,6 @@
 package cn.anlper.train.controller;
 
-import cn.anlper.train.controller.utils.RocketMqUtil;
+import cn.anlper.train.utils.RocketMqUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.apis.ClientException;

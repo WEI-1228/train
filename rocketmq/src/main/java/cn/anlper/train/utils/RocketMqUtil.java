@@ -1,4 +1,4 @@
-package cn.anlper.train.controller.utils;
+package cn.anlper.train.utils;
 
 import jakarta.annotation.Resource;
 import org.apache.rocketmq.client.apis.ClientConfiguration;

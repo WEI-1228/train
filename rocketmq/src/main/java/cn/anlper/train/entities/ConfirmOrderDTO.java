@@ -1,5 +1,6 @@
 package cn.anlper.train.entities;
 
+import cn.anlper.train.req.ConfirmOrderTicketReq;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import lombok.ToString;

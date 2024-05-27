@@ -1,5 +1,9 @@
-package cn.anlper.train.controller.config;
+package cn.anlper.train.config;
 
+import cn.anlper.train.service.ConfirmOrderService;
+import cn.anlper.train.entities.ConfirmOrderDTO;
+import com.alibaba.fastjson.JSON;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.apis.ClientConfiguration;
 import org.apache.rocketmq.client.apis.ClientException;
@@ -21,6 +25,9 @@ import java.util.Map;
 @Configuration
 @Slf4j
 public class MqConfiguration {
+    @Resource
+    private ConfirmOrderService confirmOrderService;
+
     @Value("${mq.sell-ticket-topic}")
     private String sellTicketTopic;
 
@@ -61,6 +68,8 @@ public class MqConfiguration {
                     // 将字节数组转换回字符串
                     String message = new String(bytes);
                     log.info("收到消息：{}", message);
+                    ConfirmOrderDTO confirmOrderDTO = JSON.parseObject(message, ConfirmOrderDTO.class);
+                    confirmOrderService.doConfirm(confirmOrderDTO);
                     return ConsumeResult.SUCCESS;
                 })
                 .build();
