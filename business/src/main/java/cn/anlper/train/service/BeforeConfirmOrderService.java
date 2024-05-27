@@ -75,18 +75,25 @@ public class BeforeConfirmOrderService {
     @Resource
     private SnowFlake snowFlake;
 
+    @Value("${spring.profiles.active}")
+    private String env;
+
     @SentinelResource(value = "doConfirm", blockHandler = "doConfirmBlock")
     public void beforeDoConfirm(ConfirmOrderDoReq req) {
-        // 身份验证，一个用户三秒内只能发送一次抢票请求
         Long id = LoginMemberContext.getId();
-        String userToken = RedisTokenEnum.LOCK_BUY_TICKET.getPrefix() + id;
-        String exist = redisTemplate.opsForValue().get(userToken);
-        if (StrUtil.isNotBlank(exist)) {
-            log.info("用户ID【{}】访问频率过快，限制访问", id);
-            throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_USER_VISIT_ERROR);
+        // 开发环境下不需要限制
+        if (!env.equals("dev")) {
+            // 身份验证，一个用户三秒内只能发送一次抢票请求
+            String userToken = RedisTokenEnum.LOCK_BUY_TICKET.getPrefix() + id;
+            String exist = redisTemplate.opsForValue().get(userToken);
+            if (StrUtil.isNotBlank(exist)) {
+                log.info("用户ID【{}】访问频率过快，限制访问", id);
+                throw new BusinessException(BusinessExceptionEnum.CONFIRM_ORDER_USER_VISIT_ERROR);
+            }
+            log.info("设置用户令牌：【{}】", userToken);
+            redisTemplate.opsForValue().set(userToken, userToken, 3, TimeUnit.SECONDS);
         }
-        log.info("设置用户令牌：【{}】", userToken);
-        redisTemplate.opsForValue().set(userToken, userToken, 3, TimeUnit.SECONDS);
+
 
         // 查询令牌数量
         String trainCode = req.getTrainCode();
