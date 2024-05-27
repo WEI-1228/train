@@ -24,7 +24,8 @@ public class LoginMemberFilter implements GlobalFilter, Ordered {
         || path.contains("/member/send-code")
         || path.contains("/nacos-test")
         || path.contains("/hello")
-        || path.contains("/redis")) {
+        || path.contains("/redis")
+        || path.contains("/mq")) {
             log.info("不需要登录验证：{}", path);
             return chain.filter(exchange);
         } else {

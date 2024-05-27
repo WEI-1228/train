@@ -16,6 +16,7 @@
         <module>code-generator</module>
         <module>business</module>
         <module>batch</module>
+        <module>rocketmq</module>
     </modules>
 
     <properties>
@@ -52,6 +53,7 @@
         <zipkin-reporter-brave.version>2.17.0</zipkin-reporter-brave.version>
         <pagehelper.version>1.4.6</pagehelper.version>
         <redisson.version>3.30.0</redisson.version>
+        <rocketmq.version>5.0.6</rocketmq.version>
     </properties>
 
     <dependencyManagement>
@@ -60,6 +62,12 @@
                 <groupId>cn.anlper</groupId>
                 <artifactId>common</artifactId>
                 <version>${common.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.rocketmq/rocketmq-spring-boot-starter -->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-client-java</artifactId>
+                <version>${rocketmq.version}</version>
             </dependency>
             <!--springboot 3.2.0-->
             <dependency>

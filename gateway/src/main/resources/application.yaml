@@ -21,6 +21,10 @@ spring:
           uri: lb://train-batch-service
           predicates:
             - Path=/batch/**
+        - id: mq
+          uri: lb://train-mq-service
+          predicates:
+            - Path=/mq/**
       globalcors:
         corsConfigurations:
           '[/**]':
