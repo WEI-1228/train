@@ -3,7 +3,7 @@ package cn.anlper.train.controller;
 import cn.anlper.train.exception.BusinessExceptionEnum;
 import cn.anlper.train.req.ConfirmOrderDoReq;
 import cn.anlper.train.resp.CommonResp;
-import cn.anlper.train.service.ConfirmOrderService;
+import cn.anlper.train.service.BeforeConfirmOrderService;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import jakarta.annotation.Resource;
@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConfirmOrderController {
 
     @Resource
-    private ConfirmOrderService confirmOrderService;
+    private BeforeConfirmOrderService beforeConfirmOrderService;
 
     @SentinelResource(value = "/confirm-order-ctr", blockHandler = "doConfirmBlock")
     @PostMapping("/do")
     public CommonResp doConfirm(@RequestBody @Validated ConfirmOrderDoReq req) {
-        confirmOrderService.doConfirm(req);
+        beforeConfirmOrderService.beforeDoConfirm(req);
         return CommonResp.ok(null);
     }
 

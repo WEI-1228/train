@@ -1,4 +1,4 @@
-package cn.anlper.train.controller.config;
+package cn.anlper.train.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.apis.ClientConfiguration;
@@ -8,6 +8,7 @@ import org.apache.rocketmq.client.apis.consumer.ConsumeResult;
 import org.apache.rocketmq.client.apis.consumer.FilterExpression;
 import org.apache.rocketmq.client.apis.consumer.FilterExpressionType;
 import org.apache.rocketmq.client.apis.consumer.PushConsumer;
+import org.apache.rocketmq.client.apis.message.MessageBuilder;
 import org.apache.rocketmq.client.apis.producer.Producer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,11 +22,6 @@ import java.util.Map;
 @Configuration
 @Slf4j
 public class MqConfiguration {
-    @Value("${mq.sell-ticket-topic}")
-    private String sellTicketTopic;
-
-    @Value("${mq.sell-ticket-consumer-group}")
-    private String ConsumerGroup;
 
     @Value("${mq.endpoint}")
     private String endpoint;
@@ -41,18 +37,23 @@ public class MqConfiguration {
     }
 
     @Bean
+    public MessageBuilder messageBuilder(ClientServiceProvider provider) {
+        return provider.newMessageBuilder();
+    }
+
+    @Bean
     public Map<String, Producer> producerMap() {
         return new HashMap<>();
     }
 
     @Bean
-    public PushConsumer ticketConsumer(ClientServiceProvider provider, ClientConfiguration clientConfiguration) throws ClientException {
+    public PushConsumer consumer(ClientServiceProvider provider, ClientConfiguration clientConfiguration) throws ClientException {
+        String topic = "TestTopic";
         FilterExpression filterExpression = new FilterExpression("*", FilterExpressionType.TAG);
-//        需要确保当前消费者分组是顺序投递模式，否则仍然按并发乱序投递
         return provider.newPushConsumerBuilder()
-                .setConsumerGroup(ConsumerGroup)
+                .setConsumerGroup("SellTicketGroup")
                 .setClientConfiguration(clientConfiguration)
-                .setSubscriptionExpressions(Collections.singletonMap(sellTicketTopic, filterExpression))
+                .setSubscriptionExpressions(Collections.singletonMap(topic, filterExpression))
                 .setMessageListener(messageView -> {
                     // 消费消息并返回处理结果。
                     ByteBuffer buffer = messageView.getBody();
@@ -65,5 +66,6 @@ public class MqConfiguration {
                 })
                 .build();
     }
+
 
 }

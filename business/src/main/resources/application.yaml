@@ -54,6 +54,10 @@ logging:
   level:
     cn.anlper.train.mapper: trace
 
+mq:
+  endpoint: localhost:8081
+  sell-ticket-topic: TicketOrderService
+
 #seata:
 #  tx-service-group: train-group
 #  config:
