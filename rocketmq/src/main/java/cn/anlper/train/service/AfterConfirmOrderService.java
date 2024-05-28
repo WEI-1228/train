@@ -91,7 +91,6 @@ public class AfterConfirmOrderService {
             // 如果车票保存成功了，但是后续的订单状态修改失败了，这整个方法里所做的数据库操作都会回滚
             // 但是远程调用的方法操作的数据库并不会回滚，就有问题了
             // 所以这里需要使用分布式事务来保证一致性
-            int ifs = 1/0;
             CommonResp commonResp = memberFeign.save(memberTicketSaveReq);
             log.info("调用Member接口保存订单信息，返回：{}", commonResp);
             // 更新确认订单为成功
