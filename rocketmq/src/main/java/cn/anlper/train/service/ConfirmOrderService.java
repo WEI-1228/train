@@ -49,10 +49,8 @@ public class ConfirmOrderService {
         // 用来修改订单状态的实例
         ConfirmOrder confirmOrder = new ConfirmOrder();
         confirmOrder.setId(orderID);
-        confirmOrder.setUpdateTime(new Date());
         // 订单状态修改为PENDING——排队
-        confirmOrder.setStatus(ConfirmOrderStatusEnum.PENDING.getCode());
-        confirmOrderMapper.updateByPrimaryKeySelective(confirmOrder);
+        updateStatus(confirmOrder, ConfirmOrderStatusEnum.PENDING);
 
         DailyTrainTicket dailyTrainTicket = dailyTrainTicketService.selectByUnique(date, trainCode, start, end);
         log.info("查出余票记录：{}", JSON.toJSONString(dailyTrainTicket));
@@ -62,9 +60,7 @@ public class ConfirmOrderService {
             increaseTokenNum(trainCode, date);
             log.info("余票不足，将令牌放回");
             // 订单状态修改为EMPTY——无票
-            confirmOrder.setStatus(ConfirmOrderStatusEnum.EMPTY.getCode());
-            confirmOrder.setUpdateTime(new Date());
-            confirmOrderMapper.updateByPrimaryKeySelective(confirmOrder);
+            updateStatus(confirmOrder, ConfirmOrderStatusEnum.EMPTY);
             return;
         }
         Integer startIndex = dailyTrainTicket.getStartIndex();
@@ -124,10 +120,14 @@ public class ConfirmOrderService {
             increaseTokenNum(trainCode, date);
             log.error("保存购票信息失败，将令牌放回", e);
             // 订单状态修改为FAILURE——失败
-            confirmOrder.setStatus(ConfirmOrderStatusEnum.FAILURE.getCode());
-            confirmOrder.setUpdateTime(new Date());
-            confirmOrderMapper.updateByPrimaryKeySelective(confirmOrder);
+            updateStatus(confirmOrder, ConfirmOrderStatusEnum.FAILURE);
         }
+    }
+
+    public void updateStatus(ConfirmOrder confirmOrder, ConfirmOrderStatusEnum orderStatusEnum) {
+        confirmOrder.setStatus(orderStatusEnum.getCode());
+        confirmOrder.setUpdateTime(new Date());
+        confirmOrderMapper.updateByPrimaryKeySelective(confirmOrder);
     }
 
     /**
