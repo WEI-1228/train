@@ -97,6 +97,13 @@ public class ConfirmOrderService {
             }
         }
         log.info("最终的连选情况：");
+        if (finalSelectedSeatList.isEmpty()) {
+            increaseTokenNum(trainCode, date);
+            log.info("选座失败，没有合适的座位，将令牌放回");
+            // 订单状态修改为EMPTY——无票
+            updateStatus(confirmOrder, ConfirmOrderStatusEnum.EMPTY);
+            return;
+        }
         finalSelectedSeatList.forEach(s -> log.info("{}", s.getDailyRow() + s.getDailyCol()));
 
         // 修改选中座位的sell字段
