@@ -148,7 +148,7 @@ public class CanalRocketMQClient {
                 }
 
                 // 对变化的每一行记录进行处理
-                Map<String, String> changeData = new HashMap<>();
+                Map<String, Map<String, String>> changeData = new HashMap<>();
                 for (CanalEntry.RowData rowData : rowChange.getRowDatasList()) {
                     log.info("---------------------");
                     if (eventType == CanalEntry.EventType.DELETE) {
@@ -170,15 +170,20 @@ public class CanalRocketMQClient {
                             }
                             map.put(name, value);
                         }
-                        String key = date + '-' + trainCode + '-' + start + '-' + end;
+                        String key = date + '-' + start + '-' + end;
                         String value = JSON.toJSONString(map);
-                        changeData.put(key, value);
+                        changeData.putIfAbsent(key, new HashMap<>());
+                        changeData.get(key).put(trainCode, value);
                     }
                 }
                 // 全部处理完后，更新所有余票信息
                 for (var pair: changeData.entrySet()) {
-                    redisTemplate.opsForValue().set(pair.getKey(), pair.getValue());
-                    log.info("更新库存：{}", pair.getKey());
+                    String date = pair.getKey();
+                    Map<String, String> value = pair.getValue();
+                    for (var p: value.entrySet()) {
+                        redisTemplate.opsForHash().put(date, p.getKey(), p.getValue());
+                        log.info("更新余票：{}  {}  {}", date, p.getKey(), p.getValue());
+                    }
                 }
             }
         }
