@@ -1,13 +1,14 @@
 package cn.anlper.train.consumer;
 
-import cn.anlper.train.entities.DailyTrainTicket;
-import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.otter.canal.client.rocketmq.RocketMQCanalConnector;
 import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.alibaba.otter.canal.protocol.Message;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -38,6 +39,8 @@ public class CanalRocketMQClient {
     private String groupId;
     @Value("${mq.update-ticket-time-interval}")
     private Long interval;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
 
     private final Thread.UncaughtExceptionHandler handler = (t, e) -> log.error("parse events has an error", e);
@@ -93,7 +96,7 @@ public class CanalRocketMQClient {
                 connector.connect();
                 connector.subscribe();
                 while (running) {
-                    // 非阻塞的方法，设置等待时间为1秒，也就相当于拉取数据的时间间隔为1秒，每秒更新一次余票信息
+                    // 非阻塞的方法，设置等待时间为1秒，在没有数据的时候，每秒拉取一次，减少资源占用，在有数据的时候会立即获取数据
                     List<Message> messages = connector.getListWithoutAck(interval, TimeUnit.MILLISECONDS); // 获取message
                     for (Message message : messages) {
                         long batchId = message.getId();
@@ -145,23 +148,37 @@ public class CanalRocketMQClient {
                 }
 
                 // 对变化的每一行记录进行处理
+                Map<String, String> changeData = new HashMap<>();
                 for (CanalEntry.RowData rowData : rowChange.getRowDatasList()) {
                     log.info("---------------------");
                     if (eventType == CanalEntry.EventType.DELETE) {
                         log.info("行记录被删除，不处理");
                     } else {
                         Map<String, String> map = new HashMap<>();
+                        String start = null;
+                        String end = null;
+                        String date = null;
+                        String trainCode = null;
                         for (CanalEntry.Column column: rowData.getAfterColumnsList()) {
                             String name = column.getName();
                             String value = column.getValue();
-                            String mysqlType = column.getMysqlType();
-
+                            switch (name) {
+                                case "start" -> start = value;
+                                case "end" -> end = value;
+                                case "daily_date" -> date = value;
+                                case "train_code" -> trainCode = value;
+                            }
                             map.put(name, value);
-                            log.info("【{}】:{}  ｜ mysqlType: {}", name, value, mysqlType);
                         }
-                        DailyTrainTicket dailyTrainTicket = new DailyTrainTicket();
-                        BeanUtil.fillBeanWithMap(map, dailyTrainTicket, false);
+                        String key = date + '-' + trainCode + '-' + start + '-' + end;
+                        String value = JSON.toJSONString(map);
+                        changeData.put(key, value);
                     }
+                }
+                // 全部处理完后，更新所有余票信息
+                for (var pair: changeData.entrySet()) {
+                    redisTemplate.opsForValue().set(pair.getKey(), pair.getValue());
+                    log.info("更新库存：{}", pair.getKey());
                 }
             }
         }
