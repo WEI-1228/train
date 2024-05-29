@@ -9,6 +9,7 @@ public enum RedisTokenEnum {
     // 区分各种业务在Redis中的名称
     LOCK_BUY_TICKET("buy_ticket_lock-"),
     LOCK_QUERY_TOKEN("query_token_lock-"),
+    LOCK_QUERY_REMAIN("query_remain_lock-"),
     QUERY_TOKEN_NUM("query_token_num-");
 
     final String prefix;

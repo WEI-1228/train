@@ -3,8 +3,11 @@ package cn.anlper.train.service;
 import cn.anlper.train.entities.DailyTrainTicket;
 import cn.anlper.train.entities.Train;
 import cn.anlper.train.entities.TrainStation;
+import cn.anlper.train.enums.RedisTokenEnum;
 import cn.anlper.train.enums.SeatTypeEnum;
 import cn.anlper.train.enums.TrainTypeEnum;
+import cn.anlper.train.exception.BusinessException;
+import cn.anlper.train.exception.BusinessExceptionEnum;
 import cn.anlper.train.mapper.DailyTrainTicketMapper;
 import cn.anlper.train.req.DailyTrainTicketQueryReq;
 import cn.anlper.train.resp.DailyTrainTicketQueryResp;
@@ -21,6 +24,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -32,6 +37,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -44,6 +50,8 @@ public class DailyTrainTicketService {
     private DailyTrainSeatService dailyTrainSeatService;
     @Autowired
     private StringRedisTemplate redisTemplate;
+    @Resource
+    private RedissonClient redissonClient;
 
     @Resource
     private SnowFlake snowFlake;
@@ -129,9 +137,19 @@ public class DailyTrainTicketService {
         } else {
             // 从数据库中查出数据，放入缓存，这里要防止缓存击穿
             log.info("没有缓存，去数据库中查询");
-            return queryList(req);
+            String queryLock = RedisTokenEnum.LOCK_QUERY_REMAIN.getPrefix() + key;
+            RLock lock = redissonClient.getLock(queryLock);
+            try {
+                boolean tryLock = lock.tryLock(5, TimeUnit.SECONDS);
+                // 5秒还没拿到锁，说明另一个线程很卡，或者挂了，直接返回错误信息
+                if (!tryLock) throw new BusinessException(BusinessExceptionEnum.QUERY_REMAIN_LOCK_FAIL);
+                // 双检加锁
+                if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) return queryList2(req);
+                return queryList(req);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
-
     }
 
     // 这里保持接口不变，方便测试的时候直接切换访问接口
