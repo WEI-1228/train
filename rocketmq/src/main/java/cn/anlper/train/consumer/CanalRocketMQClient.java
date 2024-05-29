@@ -107,7 +107,7 @@ public class CanalRocketMQClient {
                             // } catch (InterruptedException e) {
                             // }
                         } else {
-                            printEntry(message.getEntries());
+                            processEntry(message.getEntries());
                             // log.info(message.toString());
                         }
                     }
@@ -123,7 +123,7 @@ public class CanalRocketMQClient {
         // connector.stopRunning();
     }
 
-    protected void printEntry(List<CanalEntry.Entry> entrys) {
+    protected void processEntry(List<CanalEntry.Entry> entrys) {
         for (CanalEntry.Entry entry : entrys) {
 
             if (entry.getEntryType() == CanalEntry.EntryType.TRANSACTIONBEGIN) {
