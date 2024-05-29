@@ -29,9 +29,4 @@ public class UserDailyTrainTicketController {
         return CommonResp.ok(pageResp);
     }
 
-    @GetMapping("/query-list3")
-    public CommonResp queryList3(@Validated DailyTrainTicketQueryReq req) {
-        PageResp pageResp = dailyTrainTicketService.queryList3(req);
-        return CommonResp.ok(pageResp);
-    }
 }

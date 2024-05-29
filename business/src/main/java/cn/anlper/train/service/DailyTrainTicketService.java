@@ -20,14 +20,15 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +41,8 @@ public class DailyTrainTicketService {
     private TrainStationService trainStationService;
     @Resource
     private DailyTrainSeatService dailyTrainSeatService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Resource
     private SnowFlake snowFlake;
@@ -105,18 +108,28 @@ public class DailyTrainTicketService {
         log.info("生成日期【{}】，车次【{}】的余票信息结束", DateUtil.formatDate(date), trainCode);
     }
 
-    @Cacheable("DailyTrainTicketService.queryList3")
-    public PageResp queryList3(DailyTrainTicketQueryReq req) {
-        log.info("测试缓存击穿");
-        return null;
-    }
-
-    @CachePut("DailyTrainTicketService.queryList")
     public PageResp queryList2(DailyTrainTicketQueryReq req) {
-        return queryList(req);
+        Date dailyDate = req.getDailyDate();
+        String date = DateUtil.formatDate(dailyDate);
+        String start = req.getStart();
+        String end = req.getEnd();
+        String key = date + "-" + start + "-" + end;
+        log.info("查询的key：【{}】", key);
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+            List<Object> values = redisTemplate.opsForHash().values(key);
+            List<DailyTrainTicket> dailyTrainTicketList = new ArrayList<>();
+            for (var v: values) {
+                String json = (String) v;
+                log.info(json);
+            }
+            return new PageResp(values, (long) values.size());
+        } else {
+            // 从数据库中查出数据，放入缓存
+            return queryList(req);
+        }
+
     }
 
-//    @Cacheable("DailyTrainTicketService.queryList")
     public PageResp queryList(DailyTrainTicketQueryReq req) {
         Example example = new Example(DailyTrainTicket.class);
         Example.Criteria criteria = example.createCriteria();

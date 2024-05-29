@@ -178,11 +178,14 @@ public class CanalRocketMQClient {
                 }
                 // 全部处理完后，更新所有余票信息
                 for (var pair: changeData.entrySet()) {
-                    String date = pair.getKey();
+                    String key = pair.getKey();
                     Map<String, String> value = pair.getValue();
-                    for (var p: value.entrySet()) {
-                        redisTemplate.opsForHash().put(date, p.getKey(), p.getValue());
-                        log.info("更新余票：{}  {}  {}", date, p.getKey(), p.getValue());
+                    // 只有缓存中存在该查询项，才进行更新，防止漏了数据
+                    if (redisTemplate.hasKey(key)) {
+                        for (var p: value.entrySet()) {
+                            redisTemplate.opsForHash().put(key, p.getKey(), p.getValue());
+                            log.info("更新余票：{}  {}  {}", key, p.getKey(), p.getValue());
+                        }
                     }
                 }
             }
