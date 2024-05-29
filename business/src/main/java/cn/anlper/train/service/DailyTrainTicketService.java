@@ -16,6 +16,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
@@ -116,34 +117,43 @@ public class DailyTrainTicketService {
         String key = date + "-" + start + "-" + end;
         log.info("查询的key：【{}】", key);
         if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+            log.info("缓存命中！");
             List<Object> values = redisTemplate.opsForHash().values(key);
-            List<DailyTrainTicket> dailyTrainTicketList = new ArrayList<>();
+            List<DailyTrainTicketQueryResp> dailyTrainTicketList = new ArrayList<>();
             for (var v: values) {
                 String json = (String) v;
-                log.info(json);
+                DailyTrainTicketQueryResp object = JSON.parseObject(json, DailyTrainTicketQueryResp.class);
+                dailyTrainTicketList.add(object);
             }
-            return new PageResp(values, (long) values.size());
+            return new PageResp(dailyTrainTicketList, (long) values.size());
         } else {
-            // 从数据库中查出数据，放入缓存
+            // 从数据库中查出数据，放入缓存，这里要防止缓存击穿
+            log.info("没有缓存，去数据库中查询");
             return queryList(req);
         }
 
     }
 
+    // 这里保持接口不变，方便测试的时候直接切换访问接口
     public PageResp queryList(DailyTrainTicketQueryReq req) {
+        Date dailyDate = req.getDailyDate();
+        String trainCode = req.getTrainCode();
+        String start = req.getStart();
+        String end = req.getEnd();
+
         Example example = new Example(DailyTrainTicket.class);
         Example.Criteria criteria = example.createCriteria();
-        if (StrUtil.isNotEmpty(req.getTrainCode())) {
-            criteria.andEqualTo("trainCode", req.getTrainCode());
+        if (StrUtil.isNotEmpty(trainCode)) {
+            criteria.andEqualTo("trainCode", trainCode);
         }
-        if (ObjUtil.isNotNull(req.getDailyDate())) {
-            criteria.andEqualTo("dailyDate", req.getDailyDate());
+        if (ObjUtil.isNotNull(dailyDate)) {
+            criteria.andEqualTo("dailyDate", dailyDate);
         }
-        if (ObjUtil.isNotNull(req.getStart())) {
-            criteria.andEqualTo("start", req.getStart());
+        if (ObjUtil.isNotNull(start)) {
+            criteria.andEqualTo("start", start);
         }
-        if (ObjUtil.isNotNull(req.getEnd())) {
-            criteria.andEqualTo("end", req.getEnd());
+        if (ObjUtil.isNotNull(end)) {
+            criteria.andEqualTo("end", end);
         }
         log.info("查询页码：{}", req.getPage());
         log.info("每页条数：{}", req.getSize());
@@ -153,6 +163,14 @@ public class DailyTrainTicketService {
         log.info("总行数：{}", pageInfo.getTotal());
         log.info("总页数：{}", pageInfo.getPages());
 
+        String date = DateUtil.formatDate(dailyDate);
+        String key = date + "-" + start + "-" + end;
+        // 将数据放到缓存中去
+        log.info("初始化缓存：【{}】", key);
+        for (DailyTrainTicket dailyTrainTicket: dailyTrainTickets) {
+            String jsonString = JSON.toJSONString(dailyTrainTicket);
+            redisTemplate.opsForHash().put(key, dailyTrainTicket.getTrainCode(), jsonString);
+        }
         List<DailyTrainTicketQueryResp> ticketQueryResps = BeanUtil.copyToList(dailyTrainTickets, DailyTrainTicketQueryResp.class);
         return new PageResp<>(ticketQueryResps, pageInfo.getTotal());
     }
