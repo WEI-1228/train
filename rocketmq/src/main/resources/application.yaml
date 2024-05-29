@@ -37,5 +37,11 @@ logging:
 
 mq:
   endpoint: localhost:8081
+  nameServers: localhost:9876
+
   sell-ticket-topic: TicketOrderService
   sell-ticket-consumer-group: BuyTicketConsumerGroup
+
+  update-ticket-topic: UpdateTicketService
+  update-ticket-consumer-group: UpdateTicketConsumerGroup
+  update-ticket-time-interval: 1000 # milliseconds
