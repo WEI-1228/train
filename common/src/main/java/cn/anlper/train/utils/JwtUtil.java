@@ -2,6 +2,7 @@ package cn.anlper.train.utils;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.crypto.GlobalBouncyCastleProvider;
 import cn.hutool.json.JSONObject;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTPayload;
@@ -15,6 +16,7 @@ import java.util.Map;
 public class JwtUtil {
     private static final String key = "258079";
     public static String createToken(Long id, String mobile) {
+        GlobalBouncyCastleProvider.setUseBouncyCastle(false);
         DateTime now = DateTime.now();
         DateTime expTime = now.offsetNew(DateField.HOUR, 24);
         Map<String, Object> payload = new HashMap<>();
